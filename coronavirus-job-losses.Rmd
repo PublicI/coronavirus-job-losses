@@ -1,0 +1,106 @@
+---
+title: "coronavirus-job-losses"
+author: "Joe Yerardi"
+date: "3/23/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r import packages, echo = FALSE}
+library("dplyr")
+library("ggplot2")
+library("purrr")
+library("readr")
+library("sf")
+library("leaflet")
+library("tigris")
+```
+
+```{r import data, echo = FALSE}
+# Import (BLS's Quarterly Census of Employment and Wages (QCEW))[https://data.bls.gov/cew/apps/data_views/data_views.htm#tab=Tables] data
+
+# Total Covered, 10 Total, all industries, All Counties 2019 Third Quarter, All establishment sizes
+all_industries <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/10.csv") %>% 
+  filter(own_code == 0 & agglvl_code == 70) %>% # All ownership types, county-level, un-suppressed
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 71 Arts, entertainment, and recreation, All Counties, 2019 Third Quarter, All establishment sizes
+arts_ent_rec <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/71.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 74 & is.na(disclosure_code)) %>% # Privately-owned, county-level, un-suppressed
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 72 Accommodation and food services, All Counties, 2019 Third Quarter, All establishment sizes
+accom_food <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/72.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 74 & is.na(disclosure_code)) %>% # Privately-owned, county-level, un-suppressed
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Import 2018 county population data from the Census Bureau's American Community Survey
+county_pops <- read_csv("data/ACSDT5Y2018.B01003_data_with_overlays_2020-03-23T201239.csv") %>% 
+  mutate(area_fips = substr(GEO_ID, 10, 15)) %>% 
+  select(area_fips, county = NAME, population = B01003_001E)
+
+# Drop the duplicate header row
+county_pops <- county_pops[-1,]
+```
+
+```{r reshape data, echo = FALSE}
+# Set variables for nationwide employment and wages figures
+us_september_employment_selected_industries = 2467659 + 14108318
+us_total_qtrly_wages_selected_industries = 24359411562 + 80885211645
+us_september_employment_all_industries = 148556525
+us_total_qtrly_wages_all_industries = 2101499510734
+
+# Join the data frames
+employment_wages <- list(arts_ent_rec, accom_food, all_industries, county_pops) %>% 
+  reduce(inner_join, by = "area_fips") %>% 
+  mutate(september_employment_selected_industries = september_employment.x + september_employment.y,
+         total_qtrly_wages_selected_industries = total_qtrly_wages.x + total_qtrly_wages.y,
+         september_employment_lq = round((september_employment_selected_industries / september_employment) / (us_september_employment_selected_industries / us_september_employment_all_industries), digits = 2),
+         total_qtrly_wages_lq = round((total_qtrly_wages_selected_industries / total_qtrly_wages) / (us_total_qtrly_wages_selected_industries / us_total_qtrly_wages_all_industries), digits = 2)) %>% 
+  select(area_fips,
+         county,
+         population,
+         september_employment_selected_industries,
+         total_qtrly_wages_selected_industries,
+         september_employment_all_industries = september_employment,
+         total_qtrly_wages_all_industries = total_qtrly_wages,
+         september_employment_lq,
+         total_qtrly_wages_lq)
+
+# Export the data
+write_csv(employment_wages, "data/exported/employment_wages.csv")
+```
+
+```{r map data, echo = FALSE}
+# Import US counties shapefile
+counties <- counties(cb = T)
+
+# Join the shapefile to the employment and wages data frame
+employment_wages_geo <- geo_join(counties, employment_wages, "GEOID", "area_fips")
+
+# Drop rows with missing values (i.e. counties with suppressed BLS data)
+employment_wages_geo <- subset(employment_wages_geo, !is.na(september_employment_lq))
+
+# Set variables for the color palette and popup text
+pal <- colorNumeric("Reds", domain=employment_wages_geo$september_employment_lq)
+popup_text <- paste0(employment_wages_geo$county, " has a location quotient of ", as.character(employment_wages_geo$september_employment_lq),".")
+
+# Map the data using the September employment location quotient as the color scale
+employment_wages_geo %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(fillColor = ~ pal(employment_wages_geo$september_employment_lq),
+              fillOpacity = 0.5,
+              smoothFactor = 0.5,
+              stroke = F,
+              popup = ~ popup_text) %>% 
+  addLegend(pal = pal,
+            values = employment_wages_geo$september_employment_lq,
+            position = "bottomleft",
+            title = "Location quotient for </br/> selected industries, </br/> September 2019")
+```

@@ -9,11 +9,14 @@ editor_options:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# Set working directory
+setwd("/home/joe/Projects/coronavirus-job-losses//")
 ```
 
 ```{r import packages, echo = FALSE}
 library("dplyr")
 library("ggplot2")
+library("htmltools")
 library("purrr")
 library("readr")
 library("sf")
@@ -26,18 +29,48 @@ library("tigris")
 
 # Total Covered, 10 Total, all industries, All Counties 2019 Third Quarter, All establishment sizes
 all_industries <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/10.csv") %>% 
-  filter(own_code == 0 & agglvl_code == 70) %>% # All ownership types, county-level, un-suppressed
+  filter(own_code == 0 & agglvl_code == 70 & is.na(disclosure_code)) %>% # All ownership types, county-level, un-suppressed
+  select(area_fips, september_employment_all_industries = month3_emplvl, total_qtrly_wages_all_industries = total_qtrly_wages)
+
+# Private, NAICS 481 Air transportation, All Counties, 2019 Third Quarter, All establishment sizes
+air_transport <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/481.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 75) %>% # Privately-owned, county-level
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 482 Rail transportation, All Counties, 2019 Third Quarter, All establishment sizes
+rail_transport <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/482.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 75) %>% # Privately-owned, county-level
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 483 Water transportation, All Counties, 2019 Third Quarter, All establishment sizes
+water_transport <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/483.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 75) %>% # Privately-owned, county-level
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 485 Transit and ground passenger transportation, All Counties, 2019 Third Quarter, All establishment sizes
+transit_ground_transport <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/485.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 75) %>% # Privately-owned, county-level
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 487 Scenic and sightseeing transportation, All Counties, 2019 Third Quarter, All establishment sizes
+scenic_transport <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/487.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 75) %>% # Privately-owned, county-level
+  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+
+# Private, NAICS 488 Support activities for transportation, All Counties, 2019 Third Quarter, All establishment sizes
+support_activities_transport <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/488.csv") %>% 
+  filter(own_code == 5 & agglvl_code == 75) %>% # Privately-owned, county-level
   select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
 
 # Private, NAICS 71 Arts, entertainment, and recreation, All Counties, 2019 Third Quarter, All establishment sizes
 arts_ent_rec <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/71.csv") %>% 
-  filter(own_code == 5 & agglvl_code == 74 & is.na(disclosure_code)) %>% # Privately-owned, county-level, un-suppressed
-  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+  filter(own_code == 5 & agglvl_code == 74) %>% # Privately-owned, county-level
+  select(area_fips, september_employment_arts_ent_rec = month3_emplvl, total_qtrly_wages_arts_ent_rec = total_qtrly_wages, september_employment_lq_arts_ent_rec = lq_month3_emplvl, total_qtrly_wages_lq_arts_ent_rec = lq_total_qtrly_wages)
 
 # Private, NAICS 72 Accommodation and food services, All Counties, 2019 Third Quarter, All establishment sizes
 accom_food <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/72.csv") %>% 
-  filter(own_code == 5 & agglvl_code == 74 & is.na(disclosure_code)) %>% # Privately-owned, county-level, un-suppressed
-  select(area_fips, september_employment = month3_emplvl, total_qtrly_wages)
+  filter(own_code == 5 & agglvl_code == 74) %>% # Privately-owned, county-level
+  select(area_fips, september_employment_accom_food = month3_emplvl, total_qtrly_wages_accom_food = total_qtrly_wages, september_employment_lq_accom_food = lq_month3_emplvl, total_qtrly_wages_lq_accom_food = lq_total_qtrly_wages)
 
 # Import 2018 county population data from the Census Bureau's American Community Survey
 county_pops <- read_csv("data/ACSDT5Y2018.B01003_data_with_overlays_2020-03-23T201239.csv") %>% 
@@ -50,57 +83,136 @@ county_pops <- county_pops[-1,]
 
 ```{r reshape data, echo = FALSE}
 # Set variables for nationwide employment and wages figures
-us_september_employment_selected_industries = 2467659 + 14108318
-us_total_qtrly_wages_selected_industries = 24359411562 + 80885211645
+us_september_employment_transportation = 507269 + 392 + 68165 + 499236 + 39260 + 742948
+us_total_qtrly_wages_transportation = 11047760728 + 6158160 + 1428003244 + 4492040626 + 373221276 + 10654939055
+
+us_september_employment_arts_ent_rec = 2467659
+us_total_qtrly_wages_arts_ent_rec = 24359411562
+
+us_september_employment_accom_food = 14108318
+us_total_qtrly_wages_accom_food = 80885211645
+
 us_september_employment_all_industries = 148556525
 us_total_qtrly_wages_all_industries = 2101499510734
 
-# Join the data frames
-employment_wages <- list(arts_ent_rec, accom_food, all_industries, county_pops) %>% 
-  reduce(inner_join, by = "area_fips") %>% 
-  mutate(september_employment_selected_industries = september_employment.x + september_employment.y,
-         total_qtrly_wages_selected_industries = total_qtrly_wages.x + total_qtrly_wages.y,
-         september_employment_lq = round((september_employment_selected_industries / september_employment) / (us_september_employment_selected_industries / us_september_employment_all_industries), digits = 2),
-         total_qtrly_wages_lq = round((total_qtrly_wages_selected_industries / total_qtrly_wages) / (us_total_qtrly_wages_selected_industries / us_total_qtrly_wages_all_industries), digits = 2)) %>% 
+# Join the transportation data frames for the three-digit NAICS categories together and with the all industries data frame
+transportation <- list(air_transport, rail_transport, water_transport, transit_ground_transport, scenic_transport, support_activities_transport, all_industries, county_pops) %>% 
+  reduce(full_join, by = "area_fips") %>% 
+  mutate(september_employment_transportation = select(., 2, 4, 6, 8, 10, 12) %>% 
+           rowSums(na.rm = T),
+         total_qtrly_wages_transportation = select(., 3, 5, 7, 9, 11, 13) %>% 
+           rowSums(na.rm = T),
+         september_employment_lq_transportation = round((september_employment_transportation / september_employment_all_industries) / (us_september_employment_transportation / us_september_employment_all_industries), digits = 2),
+         total_qtrly_wages_lq_transportation = round((total_qtrly_wages_transportation / total_qtrly_wages_all_industries) / (us_total_qtrly_wages_transportation / us_total_qtrly_wages_all_industries), digits = 2)) %>% 
+  filter(!is.na(september_employment_lq_transportation)) %>% 
   select(area_fips,
          county,
          population,
-         september_employment_selected_industries,
-         total_qtrly_wages_selected_industries,
-         september_employment_all_industries = september_employment,
-         total_qtrly_wages_all_industries = total_qtrly_wages,
-         september_employment_lq,
-         total_qtrly_wages_lq)
+         september_employment_transportation,
+         total_qtrly_wages_transportation,
+         september_employment_all_industries,
+         total_qtrly_wages_all_industries,
+         september_employment_lq_transportation,
+         total_qtrly_wages_lq_transportation)
+
+# Join the arts, entertainment and recreation industry data frame with the all industries data frame
+arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>% 
+  reduce(full_join, by = "area_fips") %>% 
+  filter(!is.na(september_employment_lq_arts_ent_rec)) %>% 
+  select(area_fips,
+         county,
+         population,
+         september_employment_arts_ent_rec,
+         total_qtrly_wages_arts_ent_rec,
+         september_employment_all_industries,
+         total_qtrly_wages_all_industries,
+         september_employment_lq_arts_ent_rec,
+         total_qtrly_wages_lq_arts_ent_rec)
+
+# Join the accomodation and food services industry data frame with the all industries data frame
+accom_food <- list(accom_food, all_industries, county_pops) %>% 
+  reduce(full_join, by = "area_fips") %>% 
+  filter(!is.na(september_employment_lq_accom_food)) %>% 
+  select(area_fips,
+         county,
+         population,
+         september_employment_accom_food,
+         total_qtrly_wages_accom_food,
+         september_employment_all_industries,
+         total_qtrly_wages_all_industries,
+         september_employment_lq_accom_food,
+         total_qtrly_wages_lq_accom_food)
 
 # Export the data
-write_csv(employment_wages, "data/exported/employment_wages.csv")
+write_csv(transportation, "data/exported/transportation.csv")
+write_csv(arts_ent_rec, "data/exported/arts_ent_rec.csv")
+write_csv(accom_food, "data/exported/accom_food.csv")
 ```
 
 ```{r map data, echo = FALSE}
 # Import US counties shapefile
 counties <- counties(cb = T)
 
-# Join the shapefile to the employment and wages data frame
-employment_wages_geo <- geo_join(counties, employment_wages, "GEOID", "area_fips")
+# Join the shapefile to each of the industry data frames
+transportation_geo <- geo_join(counties, transportation, "GEOID", "area_fips", how = "inner")
+arts_ent_rec_geo <- geo_join(counties, arts_ent_rec, "GEOID", "area_fips", how = "inner")
+accom_food_geo <- geo_join(counties, accom_food, "GEOID", "area_fips", how = "inner")
 
-# Drop rows with missing values (i.e. counties with suppressed BLS data)
-employment_wages_geo <- subset(employment_wages_geo, !is.na(september_employment_lq))
+# Set variables for the color palettes and popup texts
+transportation_geo_pal <- colorNumeric("Reds", domain=transportation_geo$september_employment_lq_transportation)
+transportation_geo_popup_text <- paste0(transportation_geo$county, " has a location quotient of ", as.character(transportation_geo$september_employment_lq_transportation),".")
 
-# Set variables for the color palette and popup text
-pal <- colorNumeric("Reds", domain=employment_wages_geo$september_employment_lq)
-popup_text <- paste0(employment_wages_geo$county, " has a location quotient of ", as.character(employment_wages_geo$september_employment_lq),".")
+arts_ent_rec_geo_pal <- colorNumeric("Reds", domain=arts_ent_rec_geo$september_employment_lq_arts_ent_rec)
+arts_ent_rec_geo_popup_text <- paste0(arts_ent_rec_geo$county, " has a location quotient of ", as.character(arts_ent_rec_geo$september_employment_lq_arts_ent_rec),".")
 
-# Map the data using the September employment location quotient as the color scale
-employment_wages_geo %>% 
+accom_food_geo_pal <- colorNumeric("Reds", domain=accom_food_geo$september_employment_lq_accom_food)
+accom_food_geo_popup_text <- paste0(accom_food_geo$county, " has a location quotient of ", as.character(accom_food_geo$september_employment_lq_accom_food),".")
+
+# Map the industries using the September employment location quotient as the color scale
+transportation_geo_map <- transportation_geo %>% 
   leaflet() %>% 
   addTiles() %>% 
-  addPolygons(fillColor = ~ pal(employment_wages_geo$september_employment_lq),
+  setView(-98.483330, 38.712046, zoom = 4) %>% 
+  addPolygons(fillColor = ~ transportation_geo_pal(transportation_geo$september_employment_lq_transportation),
               fillOpacity = 0.5,
               smoothFactor = 0.5,
               stroke = F,
-              popup = ~ popup_text) %>% 
-  addLegend(pal = pal,
-            values = employment_wages_geo$september_employment_lq,
+              popup = ~ transportation_geo_popup_text) %>% 
+  addLegend(pal = transportation_geo_pal,
+            values = transportation_geo$september_employment_lq_transportation,
             position = "bottomleft",
-            title = "Location quotient for </br/> selected industries, </br/> September 2019")
+            title = "Location quotient for the</br/>transportation industry")
+
+arts_ent_rec_geo_map <- arts_ent_rec_geo %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  setView(-98.483330, 38.712046, zoom = 4) %>% 
+  addPolygons(fillColor = ~ arts_ent_rec_geo_pal(arts_ent_rec_geo$september_employment_lq_arts_ent_rec),
+              fillOpacity = 0.5,
+              smoothFactor = 0.5,
+              stroke = F,
+              popup = ~ arts_ent_rec_geo_popup_text) %>% 
+  addLegend(pal = arts_ent_rec_geo_pal,
+            values = arts_ent_rec_geo$september_employment_lq_arts_ent_rec,
+            position = "bottomleft",
+            title = "Location quotient for the arts,</br/>entertainment and recreation industry")
+
+accom_food_geo_map <- accom_food_geo %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  setView(-98.483330, 38.712046, zoom = 4) %>% 
+  addPolygons(fillColor = ~ accom_food_geo_pal(accom_food_geo$september_employment_lq_accom_food),
+              fillOpacity = 0.5,
+              smoothFactor = 0.5,
+              stroke = F,
+              popup = ~ accom_food_geo_popup_text) %>% 
+  addLegend(pal = accom_food_geo_pal,
+            values = accom_food_geo$september_employment_lq_accom_food,
+            position = "bottomleft",
+            title = "Location quotient for the accommodation</br/>and food services industry")
+
+# Export the maps
+save_html(transportation_geo_map, file = "transportation_geo_map.html", background = "white")
+save_html(arts_ent_rec_geo_map, file = "arts_ent_rec_geo_map.html", background = "white")
+save_html(accom_food_geo_map, file = "accom_food_geo_map.html", background = "white")
 ```

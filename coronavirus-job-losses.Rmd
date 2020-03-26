@@ -92,6 +92,9 @@ us_total_qtrly_wages_arts_ent_rec = 24359411562
 us_september_employment_accom_food = 14108318
 us_total_qtrly_wages_accom_food = 80885211645
 
+us_september_employment_selected_industries = us_september_employment_transportation + us_september_employment_arts_ent_rec + us_september_employment_accom_food
+us_total_qtrly_wages_selected_industries = us_total_qtrly_wages_transportation + us_total_qtrly_wages_arts_ent_rec + us_total_qtrly_wages_accom_food
+
 us_september_employment_all_industries = 148556525
 us_total_qtrly_wages_all_industries = 2101499510734
 
@@ -102,9 +105,11 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
            rowSums(na.rm = T),
          total_qtrly_wages_transportation = select(., 3, 5, 7, 9, 11, 13) %>% 
            rowSums(na.rm = T),
+         september_employment_lc_transportation = round(september_employment_transportation / september_employment_all_industries, digits = 2),
+         total_qtrly_wages_lc_transportation = round(total_qtrly_wages_transportation / total_qtrly_wages_all_industries, digits = 2),
          september_employment_lq_transportation = round((september_employment_transportation / september_employment_all_industries) / (us_september_employment_transportation / us_september_employment_all_industries), digits = 2),
          total_qtrly_wages_lq_transportation = round((total_qtrly_wages_transportation / total_qtrly_wages_all_industries) / (us_total_qtrly_wages_transportation / us_total_qtrly_wages_all_industries), digits = 2)) %>% 
-  filter(!is.na(september_employment_lq_transportation)) %>% 
+  filter(!is.na(september_employment_lc_transportation)) %>% 
   select(area_fips,
          county,
          population,
@@ -112,13 +117,17 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
          total_qtrly_wages_transportation,
          september_employment_all_industries,
          total_qtrly_wages_all_industries,
+         september_employment_lc_transportation,
+         total_qtrly_wages_lc_transportation,
          september_employment_lq_transportation,
          total_qtrly_wages_lq_transportation)
 
 # Join the arts, entertainment and recreation industry data frame with the all industries data frame
 arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>% 
   reduce(full_join, by = "area_fips") %>% 
-  filter(!is.na(september_employment_lq_arts_ent_rec)) %>% 
+  mutate(september_employment_lc_arts_ent_rec = round(september_employment_arts_ent_rec / september_employment_all_industries, digits = 2),
+         total_qtrly_wages_lc_arts_ent_rec = round(total_qtrly_wages_arts_ent_rec / total_qtrly_wages_all_industries, digits = 2)) %>% 
+  filter(!is.na(september_employment_lc_arts_ent_rec)) %>% 
   select(area_fips,
          county,
          population,
@@ -126,13 +135,17 @@ arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>%
          total_qtrly_wages_arts_ent_rec,
          september_employment_all_industries,
          total_qtrly_wages_all_industries,
+         september_employment_lc_arts_ent_rec,
+         total_qtrly_wages_lc_arts_ent_rec,
          september_employment_lq_arts_ent_rec,
          total_qtrly_wages_lq_arts_ent_rec)
 
 # Join the accomodation and food services industry data frame with the all industries data frame
 accom_food <- list(accom_food, all_industries, county_pops) %>% 
   reduce(full_join, by = "area_fips") %>% 
-  filter(!is.na(september_employment_lq_accom_food)) %>% 
+  mutate(september_employment_lc_accom_food = round(september_employment_accom_food / september_employment_all_industries, digits = 2),
+         total_qtrly_wages_lc_accom_food = round(total_qtrly_wages_accom_food / total_qtrly_wages_all_industries, digits = 2)) %>% 
+  filter(!is.na(september_employment_lc_accom_food)) %>% 
   select(area_fips,
          county,
          population,
@@ -140,13 +153,40 @@ accom_food <- list(accom_food, all_industries, county_pops) %>%
          total_qtrly_wages_accom_food,
          september_employment_all_industries,
          total_qtrly_wages_all_industries,
+         september_employment_lc_accom_food,
+         total_qtrly_wages_lc_accom_food,
          september_employment_lq_accom_food,
          total_qtrly_wages_lq_accom_food)
+
+# Join all the selected industries data frames together
+selected_industries <- list(transportation, arts_ent_rec, accom_food) %>% 
+  reduce(full_join, by = "area_fips") %>% 
+  mutate(september_employment_selected_industries = select(., 4, 14, 24) %>% 
+           rowSums(na.rm = T),
+         total_qtrly_wages_selected_industries = select(., 5, 15, 25) %>% 
+           rowSums(na.rm = T),
+         september_employment_lc_selected_industries = round(september_employment_selected_industries / september_employment_all_industries, digits = 2),
+         total_qtrly_wages_lc_selected_industries = round(total_qtrly_wages_selected_industries / total_qtrly_wages_all_industries, digits = 2),
+         september_employment_lq_selected_industries = round((september_employment_selected_industries / september_employment_all_industries) / (us_september_employment_selected_industries / us_september_employment_all_industries), digits = 2),
+         total_qtrly_wages_lq_selected_industries = round((total_qtrly_wages_selected_industries / total_qtrly_wages_all_industries) / (us_total_qtrly_wages_selected_industries / us_total_qtrly_wages_all_industries), digits = 2)) %>% 
+  filter(!is.na(september_employment_lc_selected_industries)) %>% 
+  select(area_fips,
+         county,
+         population,
+         september_employment_selected_industries,
+         total_qtrly_wages_selected_industries,
+         september_employment_all_industries,
+         total_qtrly_wages_all_industries,
+         september_employment_lc_selected_industries,
+         total_qtrly_wages_lc_selected_industries,
+         september_employment_lq_selected_industries,
+         total_qtrly_wages_lq_selected_industries)
 
 # Export the data
 write_csv(transportation, "data/exported/transportation.csv")
 write_csv(arts_ent_rec, "data/exported/arts_ent_rec.csv")
 write_csv(accom_food, "data/exported/accom_food.csv")
+write_csv(selected_industries, "data/exported/selected_industries.csv")
 ```
 
 ```{r map data, echo = FALSE}
@@ -157,62 +197,81 @@ counties <- counties(cb = T)
 transportation_geo <- geo_join(counties, transportation, "GEOID", "area_fips", how = "inner")
 arts_ent_rec_geo <- geo_join(counties, arts_ent_rec, "GEOID", "area_fips", how = "inner")
 accom_food_geo <- geo_join(counties, accom_food, "GEOID", "area_fips", how = "inner")
+selected_industries_geo <- geo_join(counties, selected_industries, "GEOID", "area_fips", how = "inner")
 
 # Set variables for the color palettes and popup texts
-transportation_geo_pal <- colorNumeric("Reds", domain=transportation_geo$september_employment_lq_transportation)
-transportation_geo_popup_text <- paste0(transportation_geo$county, " has a location quotient of ", as.character(transportation_geo$september_employment_lq_transportation),".")
+transportation_geo_pal <- colorNumeric("Reds", domain=transportation_geo$september_employment_lc_transportation)
+transportation_geo_popup_text <- paste0(transportation_geo$county, " has a local concentration of ", as.character(transportation_geo$september_employment_lc_transportation),".")
 
-arts_ent_rec_geo_pal <- colorNumeric("Reds", domain=arts_ent_rec_geo$september_employment_lq_arts_ent_rec)
-arts_ent_rec_geo_popup_text <- paste0(arts_ent_rec_geo$county, " has a location quotient of ", as.character(arts_ent_rec_geo$september_employment_lq_arts_ent_rec),".")
+arts_ent_rec_geo_pal <- colorNumeric("Reds", domain=arts_ent_rec_geo$september_employment_lc_arts_ent_rec)
+arts_ent_rec_geo_popup_text <- paste0(arts_ent_rec_geo$county, " has a local concentration of ", as.character(arts_ent_rec_geo$september_employment_lc_arts_ent_rec),".")
 
-accom_food_geo_pal <- colorNumeric("Reds", domain=accom_food_geo$september_employment_lq_accom_food)
-accom_food_geo_popup_text <- paste0(accom_food_geo$county, " has a location quotient of ", as.character(accom_food_geo$september_employment_lq_accom_food),".")
+accom_food_geo_pal <- colorNumeric("Reds", domain=accom_food_geo$september_employment_lc_accom_food)
+accom_food_geo_popup_text <- paste0(accom_food_geo$county, " has a local concentration of ", as.character(accom_food_geo$september_employment_lc_accom_food),".")
 
-# Map the industries using the September employment location quotient as the color scale
+selected_industries_geo_pal <- colorNumeric("Reds", domain=selected_industries_geo$september_employment_lc_selected_industries)
+selected_industries_geo_popup_text <- paste0(selected_industries_geo$county, " has a local concentration of ", as.character(selected_industries_geo$september_employment_lc_selected_industries),".")
+
+# Map the industries using the September employment local concentration as the color scale
 transportation_geo_map <- transportation_geo %>% 
   leaflet() %>% 
   addTiles() %>% 
   setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ transportation_geo_pal(transportation_geo$september_employment_lq_transportation),
+  addPolygons(fillColor = ~ transportation_geo_pal(transportation_geo$september_employment_lc_transportation),
               fillOpacity = 0.5,
               smoothFactor = 0.5,
               stroke = F,
               popup = ~ transportation_geo_popup_text) %>% 
   addLegend(pal = transportation_geo_pal,
-            values = transportation_geo$september_employment_lq_transportation,
+            values = transportation_geo$september_employment_lc_transportation,
             position = "bottomleft",
-            title = "Location quotient for the</br/>transportation industry")
+            title = "Local concentration for the</br/>transportation industry")
 
 arts_ent_rec_geo_map <- arts_ent_rec_geo %>% 
   leaflet() %>% 
   addTiles() %>% 
   setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ arts_ent_rec_geo_pal(arts_ent_rec_geo$september_employment_lq_arts_ent_rec),
+  addPolygons(fillColor = ~ arts_ent_rec_geo_pal(arts_ent_rec_geo$september_employment_lc_arts_ent_rec),
               fillOpacity = 0.5,
               smoothFactor = 0.5,
               stroke = F,
               popup = ~ arts_ent_rec_geo_popup_text) %>% 
   addLegend(pal = arts_ent_rec_geo_pal,
-            values = arts_ent_rec_geo$september_employment_lq_arts_ent_rec,
+            values = arts_ent_rec_geo$september_employment_lc_arts_ent_rec,
             position = "bottomleft",
-            title = "Location quotient for the arts,</br/>entertainment and recreation industry")
+            title = "Local concentration for the arts,</br/>entertainment and recreation industry")
 
 accom_food_geo_map <- accom_food_geo %>% 
   leaflet() %>% 
   addTiles() %>% 
   setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ accom_food_geo_pal(accom_food_geo$september_employment_lq_accom_food),
+  addPolygons(fillColor = ~ accom_food_geo_pal(accom_food_geo$september_employment_lc_accom_food),
               fillOpacity = 0.5,
               smoothFactor = 0.5,
               stroke = F,
               popup = ~ accom_food_geo_popup_text) %>% 
   addLegend(pal = accom_food_geo_pal,
-            values = accom_food_geo$september_employment_lq_accom_food,
+            values = accom_food_geo$september_employment_lc_accom_food,
             position = "bottomleft",
-            title = "Location quotient for the accommodation</br/>and food services industry")
+            title = "Local concentration for the accommodation</br/>and food services industry")
+
+selected_industries_geo_map <- selected_industries_geo %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  setView(-98.483330, 38.712046, zoom = 4) %>% 
+  addPolygons(fillColor = ~ selected_industries_geo_pal(selected_industries_geo$september_employment_lc_selected_industries),
+              fillOpacity = 0.5,
+              smoothFactor = 0.5,
+              stroke = F,
+              popup = ~ selected_industries_geo_popup_text) %>% 
+  addLegend(pal = selected_industries_geo_pal,
+            values = selected_industries_geo$september_employment_lc_selected_industries,
+            position = "bottomleft",
+            title = "Local concentration for</br/>selected industries")
 
 # Export the maps
-save_html(transportation_geo_map, file = "transportation_geo_map.html", background = "white")
-save_html(arts_ent_rec_geo_map, file = "arts_ent_rec_geo_map.html", background = "white")
-save_html(accom_food_geo_map, file = "accom_food_geo_map.html", background = "white")
+save_html(transportation_geo_map, file = paste0(getwd(),"/maps/transportation_geo_map.html"), background = "white")
+save_html(arts_ent_rec_geo_map, file = paste0(getwd(),"/maps/arts_ent_rec_geo_map.html"), background = "white")
+save_html(accom_food_geo_map, file = paste0(getwd(),"/maps/accom_food_geo_map.html"), background = "white")
+save_html(selected_industries_geo_map, file = paste0(getwd(),"/maps/selected_industries_geo_map.html"), background = "white")
 ```

@@ -20,6 +20,8 @@ library("htmltools")
 library("purrr")
 library("readr")
 library("sf")
+library("stringr")
+library("tidyr")
 library("leaflet")
 library("tigris")
 ```
@@ -73,12 +75,20 @@ accom_food <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/72.csv
   select(area_fips, september_employment_accom_food = month3_emplvl, total_qtrly_wages_accom_food = total_qtrly_wages, september_employment_lq_accom_food = lq_month3_emplvl, total_qtrly_wages_lq_accom_food = lq_total_qtrly_wages)
 
 # Import 2018 county population data from the Census Bureau's American Community Survey
-county_pops <- read_csv("data/ACSDT5Y2018.B01003_data_with_overlays_2020-03-23T201239.csv") %>% 
-  mutate(area_fips = substr(GEO_ID, 10, 15)) %>% 
-  select(area_fips, county = NAME, population = B01003_001E)
-
+county_pops <- read_csv("data/ACSDT5Y2018.B01003_data_with_overlays_2020-03-23T201239.csv")
 # Drop the duplicate header row
 county_pops <- county_pops[-1,]
+# Convert the population column to numeric
+county_pops$B01003_001E <- as.numeric(as.character(county_pops$B01003_001E))
+# Create separate county and state columns
+county_pops$county = separate(data = county_pops, col = NAME, into = c("county", "state"), sep = ", ", remove = T)[, 2]
+county_pops$state = separate(data = county_pops, col = NAME, into = c("county", "state"), sep = ", ", remove = T)[, 3]
+# Drop unnecessary columns
+county_pops <- county_pops %>% 
+  mutate(area_fips = substr(GEO_ID, 10, 15),
+         county = unlist(county, use.names = T),
+         state = unlist(state, use.names = T)) %>% 
+  select(area_fips, county, state, population = B01003_001E)
 ```
 
 ```{r reshape data, echo = FALSE}
@@ -112,6 +122,7 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
   filter(!is.na(september_employment_lc_transportation)) %>% 
   select(area_fips,
          county,
+         state,
          population,
          september_employment_transportation,
          total_qtrly_wages_transportation,
@@ -130,6 +141,7 @@ arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>%
   filter(!is.na(september_employment_lc_arts_ent_rec)) %>% 
   select(area_fips,
          county,
+         state,
          population,
          september_employment_arts_ent_rec,
          total_qtrly_wages_arts_ent_rec,
@@ -148,6 +160,7 @@ accom_food <- list(accom_food, all_industries, county_pops) %>%
   filter(!is.na(september_employment_lc_accom_food)) %>% 
   select(area_fips,
          county,
+         state,
          population,
          september_employment_accom_food,
          total_qtrly_wages_accom_food,
@@ -161,9 +174,9 @@ accom_food <- list(accom_food, all_industries, county_pops) %>%
 # Join all the selected industries data frames together
 selected_industries <- list(transportation, arts_ent_rec, accom_food) %>% 
   reduce(full_join, by = "area_fips") %>% 
-  mutate(september_employment_selected_industries = select(., 4, 14, 24) %>% 
+  mutate(september_employment_selected_industries = select(., 5, 16, 27) %>% 
            rowSums(na.rm = T),
-         total_qtrly_wages_selected_industries = select(., 5, 15, 25) %>% 
+         total_qtrly_wages_selected_industries = select(., 6, 17, 28) %>% 
            rowSums(na.rm = T),
          september_employment_lc_selected_industries = round(september_employment_selected_industries / september_employment_all_industries, digits = 2),
          total_qtrly_wages_lc_selected_industries = round(total_qtrly_wages_selected_industries / total_qtrly_wages_all_industries, digits = 2),
@@ -172,6 +185,7 @@ selected_industries <- list(transportation, arts_ent_rec, accom_food) %>%
   filter(!is.na(september_employment_lc_selected_industries)) %>% 
   select(area_fips,
          county,
+         state,
          population,
          september_employment_selected_industries,
          total_qtrly_wages_selected_industries,
@@ -274,4 +288,26 @@ save_html(transportation_geo_map, file = paste0(getwd(),"/maps/transportation_ge
 save_html(arts_ent_rec_geo_map, file = paste0(getwd(),"/maps/arts_ent_rec_geo_map.html"), background = "white")
 save_html(accom_food_geo_map, file = paste0(getwd(),"/maps/accom_food_geo_map.html"), background = "white")
 save_html(selected_industries_geo_map, file = paste0(getwd(),"/maps/selected_industries_geo_map.html"), background = "white")
+```
+
+```{r analyze the data, echo = FALSE}
+# What proportion of counties are reliant on these industries for at least 25 percent of their jobs?
+selected_industries %>% 
+  filter(september_employment_lc_selected_industries >= .25)
+
+# What proportion of states have at least one county that is reliant on these industries for at least 25 percent of their jobs?
+selected_industries %>% 
+  filter(september_employment_lc_selected_industries >= .25) %>% 
+  group_by(state) %>% 
+  summarize(count = n())
+
+# What proportion of counties are reliant on each of industries for at least 25 percent of their jobs?
+transportation %>% 
+  filter(september_employment_lc_transportation >= .10)
+
+# What proportion of states have at least one county that is reliant on these industries for at least 25 percent of their jobs?
+selected_industries %>% 
+  filter(september_employment_lc_selected_industries >= .25) %>% 
+  group_by(state) %>% 
+  summarize(count = n())
 ```

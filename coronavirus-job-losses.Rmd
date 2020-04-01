@@ -75,8 +75,20 @@ accom_food <- read_csv("https://data.bls.gov/cew/data/api/2019/3/industry/72.csv
   select(area_fips, september_employment_accom_food = month3_emplvl, total_qtrly_wages_accom_food = total_qtrly_wages, september_employment_lq_accom_food = lq_month3_emplvl, total_qtrly_wages_lq_accom_food = lq_total_qtrly_wages)
 
 # Import 2017 health insurance data from the Census Bureau's (Small Area Health Insurance Estimates)[https://www.census.gov/programs-surveys/sahie/data/datasets.html]
-health_insurance_17 <- read_csv("data/sahie_2017.csv", skip = 79)
-
+health_insurance <- read_csv("data/sahie_2017.csv", skip = 79) %>% 
+  filter(geocat == "50" & (iprcat == "0" | iprcat == "5") & (agecat == "0" | agecat == "3") & sexcat == "0") %>% 
+  mutate(area_fips = paste0(statefips, countyfips)) %>% 
+  # Reshape the data from "long" to "wide" format
+  pivot_wider(id_cols = area_fips,
+              names_from = c("iprcat", "agecat"),
+              values_from = c("NUI", "PCTUI")) %>% 
+  select(area_fips,
+         num_uninsured_total = NUI_0_0,
+         num_uninsured_below_400_poverty = NUI_5_0,
+         num_uninsured_age_50_up = NUI_0_3,
+         pct_uninsured_total = PCTUI_0_0,
+         pct_uninsured_below_400_poverty = PCTUI_5_0,
+         pct_uninsured_age_50_up = PCTUI_0_3)
 
 # Import 2018 county population data from the Census Bureau's American Community Survey
 county_pops <- read_csv("data/ACSDT5Y2018.B01003_data_with_overlays_2020-03-23T201239.csv")
@@ -112,8 +124,8 @@ us_total_qtrly_wages_selected_industries = us_total_qtrly_wages_transportation +
 us_september_employment_all_industries = 148556525
 us_total_qtrly_wages_all_industries = 2101499510734
 
-# Join the transportation data frames for the three-digit NAICS categories together and with the all industries data frame
-transportation <- list(air_transport, rail_transport, water_transport, transit_ground_transport, scenic_transport, support_activities_transport, all_industries, county_pops) %>% 
+# Join the transportation data frames for the three-digit NAICS categories together and with the other data frame
+transportation <- list(air_transport, rail_transport, water_transport, transit_ground_transport, scenic_transport, support_activities_transport, all_industries, county_pops, health_insurance) %>% 
   reduce(full_join, by = "area_fips") %>% 
   mutate(september_employment_transportation = select(., 2, 4, 6, 8, 10, 12) %>% 
            rowSums(na.rm = T),
@@ -128,6 +140,9 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
          county,
          state,
          population,
+         pct_uninsured_total,
+         pct_uninsured_below_400_poverty,
+         pct_uninsured_age_50_up,
          september_employment_transportation,
          total_qtrly_wages_transportation,
          september_employment_all_industries,
@@ -137,8 +152,8 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
          september_employment_lq_transportation,
          total_qtrly_wages_lq_transportation)
 
-# Join the arts, entertainment and recreation industry data frame with the all industries data frame
-arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>% 
+# Join the arts, entertainment and recreation industry data frame with the other data frames
+arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops, health_insurance) %>% 
   reduce(full_join, by = "area_fips") %>% 
   mutate(september_jobs_per_thousand_arts_ent_rec = round(september_employment_arts_ent_rec / september_employment_all_industries * 1000, digits = 0),
          total_qtrly_wages_lc_arts_ent_rec = round(total_qtrly_wages_arts_ent_rec / total_qtrly_wages_all_industries, digits = 2)) %>% 
@@ -147,6 +162,9 @@ arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>%
          county,
          state,
          population,
+         pct_uninsured_total,
+         pct_uninsured_below_400_poverty,
+         pct_uninsured_age_50_up,
          september_employment_arts_ent_rec,
          total_qtrly_wages_arts_ent_rec,
          september_employment_all_industries,
@@ -156,8 +174,8 @@ arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops) %>%
          september_employment_lq_arts_ent_rec,
          total_qtrly_wages_lq_arts_ent_rec)
 
-# Join the accomodation and food services industry data frame with the all industries data frame
-accom_food <- list(accom_food, all_industries, county_pops) %>% 
+# Join the accomodation and food services industry data frame with the other data frames
+accom_food <- list(accom_food, all_industries, county_pops, health_insurance) %>% 
   reduce(full_join, by = "area_fips") %>% 
   mutate(september_jobs_per_thousand_accom_food = round(september_employment_accom_food / september_employment_all_industries * 1000, digits = 0),
          total_qtrly_wages_lc_accom_food = round(total_qtrly_wages_accom_food / total_qtrly_wages_all_industries, digits = 2)) %>% 
@@ -166,6 +184,9 @@ accom_food <- list(accom_food, all_industries, county_pops) %>%
          county,
          state,
          population,
+         pct_uninsured_total,
+         pct_uninsured_below_400_poverty,
+         pct_uninsured_age_50_up,
          september_employment_accom_food,
          total_qtrly_wages_accom_food,
          september_employment_all_industries,
@@ -178,9 +199,9 @@ accom_food <- list(accom_food, all_industries, county_pops) %>%
 # Join all the selected industries data frames together
 selected_industries <- list(transportation, arts_ent_rec, accom_food) %>% 
   reduce(full_join, by = "area_fips") %>% 
-  mutate(september_employment_selected_industries = select(., 5, 16, 27) %>% 
+  mutate(september_employment_selected_industries = select(., 8, 22, 36) %>% 
            rowSums(na.rm = T),
-         total_qtrly_wages_selected_industries = select(., 6, 17, 28) %>% 
+         total_qtrly_wages_selected_industries = select(., 9, 23, 37) %>% 
            rowSums(na.rm = T),
          september_jobs_per_thousand_selected_industries = round(september_employment_selected_industries / september_employment_all_industries * 1000, digits = 0),
          total_qtrly_wages_lc_selected_industries = round(total_qtrly_wages_selected_industries / total_qtrly_wages_all_industries, digits = 2),
@@ -191,6 +212,9 @@ selected_industries <- list(transportation, arts_ent_rec, accom_food) %>%
          county,
          state,
          population,
+         pct_uninsured_total,
+         pct_uninsured_below_400_poverty,
+         pct_uninsured_age_50_up,
          september_employment_selected_industries,
          total_qtrly_wages_selected_industries,
          september_employment_all_industries,
@@ -200,37 +224,56 @@ selected_industries <- list(transportation, arts_ent_rec, accom_food) %>%
          september_employment_lq_selected_industries,
          total_qtrly_wages_lq_selected_industries)
 
+# Join the health insurance and county population data frames
+health_insurance <- health_insurance %>% 
+  full_join(county_pops, by = "area_fips") %>% 
+  select(area_fips,
+         county,
+         state,
+         population,
+         num_uninsured_total,
+         num_uninsured_below_400_poverty,
+         num_uninsured_age_50_up,
+         pct_uninsured_total,
+         pct_uninsured_below_400_poverty,
+         pct_uninsured_age_50_up)
+
 # Export the data
 write_csv(transportation, "data/exported/transportation.csv")
 write_csv(arts_ent_rec, "data/exported/arts_ent_rec.csv")
 write_csv(accom_food, "data/exported/accom_food.csv")
 write_csv(selected_industries, "data/exported/selected_industries.csv")
+write_csv(health_insurance, "data/exported/health_insurance.csv")
 ```
 
 ```{r map data, echo = FALSE}
 # Import US counties shapefile
 counties <- counties(cb = T)
 
-# Join the shapefile to each of the industry data frames
+# Join the shapefile to each of the industry data frames plus the health insurance data frame
 transportation_geo <- geo_join(counties, transportation, "GEOID", "area_fips", how = "inner")
 arts_ent_rec_geo <- geo_join(counties, arts_ent_rec, "GEOID", "area_fips", how = "inner")
 accom_food_geo <- geo_join(counties, accom_food, "GEOID", "area_fips", how = "inner")
 selected_industries_geo <- geo_join(counties, selected_industries, "GEOID", "area_fips", how = "inner")
+health_insurance_geo <- geo_join(counties, health_insurance, "GEOID", "area_fips", how = "inner")
 
 # Set variables for the color palettes and popup texts
-transportation_geo_pal <- colorNumeric("Reds", domain=transportation_geo$september_jobs_per_thousand_transportation)
-transportation_geo_popup_text <- paste0(transportation_geo$county, " has ", as.character(transportation_geo$september_jobs_per_thousand_transportation)," jobs per thousand.")
+transportation_geo_pal <- colorNumeric("Reds", domain = transportation_geo$september_jobs_per_thousand_transportation)
+transportation_geo_popup_text <- paste0(transportation_geo$county, " has ", as.character(transportation_geo$september_jobs_per_thousand_transportation)," transportation jobs per thousand total jobs.")
 
-arts_ent_rec_geo_pal <- colorNumeric("Reds", domain=arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec)
-arts_ent_rec_geo_popup_text <- paste0(arts_ent_rec_geo$county, " has ", as.character(arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec)," jobs per thousand.")
+arts_ent_rec_geo_pal <- colorNumeric("Reds", domain = arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec)
+arts_ent_rec_geo_popup_text <- paste0(arts_ent_rec_geo$county, " has ", as.character(arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec)," arts, entertainment and recreation jobs per thousand total jobs.")
 
-accom_food_geo_pal <- colorNumeric("Reds", domain=accom_food_geo$september_jobs_per_thousand_accom_food)
-accom_food_geo_popup_text <- paste0(accom_food_geo$county, " has ", as.character(accom_food_geo$september_jobs_per_thousand_accom_food)," jobs per thousand.")
+accom_food_geo_pal <- colorNumeric("Reds", domain = accom_food_geo$september_jobs_per_thousand_accom_food)
+accom_food_geo_popup_text <- paste0(accom_food_geo$county, " has ", as.character(accom_food_geo$september_jobs_per_thousand_accom_food)," accomodation and food services jobs per thousand total jobs.")
 
-selected_industries_geo_pal <- colorNumeric("Reds", domain=selected_industries_geo$september_jobs_per_thousand_selected_industries)
-selected_industries_geo_popup_text <- paste0(selected_industries_geo$county, " has ", as.character(selected_industries_geo$september_jobs_per_thousand_selected_industries),".")
+selected_industries_geo_pal <- colorNumeric("Reds", domain = selected_industries_geo$september_jobs_per_thousand_selected_industries)
+selected_industries_geo_popup_text <- paste0(selected_industries_geo$county, " has ", as.character(selected_industries_geo$september_jobs_per_thousand_selected_industries)," selected industry obs per thousand total jobs.")
 
-# Map the industries using the September jobs per thousand figure as the color scale
+health_insurance_geo_pal <- colorNumeric("Reds", domain = health_insurance_geo$pct_uninsured_total)
+health_insurance_geo_popup_text <- paste0(health_insurance_geo$county, " has a ", as.character(health_insurance_geo$pct_uninsured_total),"% uninsured rate.")
+
+# Map the data frames
 transportation_geo_map <- transportation_geo %>% 
   leaflet() %>% 
   addTiles() %>% 
@@ -287,31 +330,38 @@ selected_industries_geo_map <- selected_industries_geo %>%
             position = "bottomleft",
             title = "Jobs per thousand in </br/>selected industries")
 
+health_insurance_geo_map <- health_insurance_geo %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  setView(-98.483330, 38.712046, zoom = 4) %>% 
+  addPolygons(fillColor = ~ health_insurance_geo_pal(health_insurance_geo$pct_uninsured_total),
+              fillOpacity = 0.5,
+              smoothFactor = 0.5,
+              stroke = F,
+              popup = ~ health_insurance_geo_popup_text) %>% 
+  addLegend(pal = health_insurance_geo_pal,
+            values = health_insurance_geo$pct_uninsured_total,
+            position = "bottomleft",
+            title = "Under-65 uninsured rate")
+
 # Export the maps
 save_html(transportation_geo_map, file = paste0(getwd(),"/maps/transportation_geo_map.html"), background = "white")
 save_html(arts_ent_rec_geo_map, file = paste0(getwd(),"/maps/arts_ent_rec_geo_map.html"), background = "white")
 save_html(accom_food_geo_map, file = paste0(getwd(),"/maps/accom_food_geo_map.html"), background = "white")
 save_html(selected_industries_geo_map, file = paste0(getwd(),"/maps/selected_industries_geo_map.html"), background = "white")
+save_html(health_insurance_geo_map, file = paste0(getwd(),"/maps/health_insurance_geo_map.html"), background = "white")
 ```
 
 ```{r analyze the data, echo = FALSE}
 # What proportion of counties are reliant on these industries for at least 25 percent of their jobs?
 selected_industries %>% 
-  filter(september_employment_lc_selected_industries >= .25)
+  filter(september_jobs_per_thousand_selected_industries >= 250)
+
+# How many of these counties are also among the 100 least-insured in 2017?
 
 # What proportion of states have at least one county that is reliant on these industries for at least 25 percent of their jobs?
 selected_industries %>% 
-  filter(september_employment_lc_selected_industries >= .25) %>% 
-  group_by(state) %>% 
-  summarize(count = n())
-
-# What proportion of counties are reliant on each of industries for at least 25 percent of their jobs?
-transportation %>% 
-  filter(september_jobs_per_thousand_transportation >= .10)
-
-# What proportion of states have at least one county that is reliant on these industries for at least 25 percent of their jobs?
-selected_industries %>% 
-  filter(september_employment_lc_selected_industries >= .25) %>% 
+  filter(september_jobs_per_thousand_selected_industries >= 250) %>% 
   group_by(state) %>% 
   summarize(count = n())
 ```

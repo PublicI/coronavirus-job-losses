@@ -227,6 +227,7 @@ selected_industries <- list(transportation, arts_ent_rec, accom_food) %>%
 # Join the health insurance and county population data frames
 health_insurance <- health_insurance %>% 
   full_join(county_pops, by = "area_fips") %>% 
+  filter(!is.na(pct_uninsured_total)) %>% 
   select(area_fips,
          county,
          state,
@@ -353,17 +354,17 @@ save_html(health_insurance_geo_map, file = paste0(getwd(),"/maps/health_insuranc
 ```
 
 ```{r analyze the data, echo = FALSE}
-# Which counties are most reliant on these industries for jobs?
-most_reliant <- selected_industries %>% 
+# Which counties are more reliant on these industries for jobs than the nation as a whole?
+more_reliant <- selected_industries %>% 
   filter(september_employment_lq_selected_industries > 1)
 
-# Which 100 counties have the highest rate of uninsured residents under the age of 65?
-most_uninsured <- health_insurance %>% 
+# Which counties have a rate of uninsured residents higher than the nation as a whole?
+more_uninsured <- health_insurance %>% 
   filter(pct_uninsured_total > 10) # [2018 national rate of uninsurance among residents under the age of 65 = 10%](https://www.census.gov/data/tables/2019/demo/health-insurance/p60-267.html)
 
 # Which counties meet both conditions?
-most_reliant_uninsured <- most_reliant %>% 
-  inner_join(most_uninsured, by = "area_fips") %>% 
+more_reliant_uninsured <- more_reliant %>% 
+  inner_join(more_uninsured, by = "area_fips") %>% 
   select(area_fips,
          county = county.x,
          state = state.x,
@@ -373,4 +374,9 @@ most_reliant_uninsured <- most_reliant %>%
          september_employment_selected_industries,
          september_jobs_per_thousand_selected_industries,
          september_employment_lq_selected_industries)
+
+# Export the data
+write_csv(more_reliant, "data/exported/more_reliant.csv")
+write_csv(more_uninsured, "data/exported/more_uninsured.csv")
+write_csv(more_reliant_uninsured, "data/exported/more_reliant_uninsured.csv")
 ```

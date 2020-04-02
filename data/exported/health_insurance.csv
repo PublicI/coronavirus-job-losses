@@ -1,4 +1,4 @@
-area_fips,county,state,population,num_uninsured_total,num_uninsured_below_400_poverty,num_uninsured_age_50_up,pct_uninsured_total,pct_uninsured_below_400_poverty,pct_uninsured_age_50_up
+area_fips,county,state,population,num_uninsured_total,num_uninsured_138_400_poverty,num_uninsured_age_50_up,pct_uninsured_total,pct_uninsured_138_400_poverty,pct_uninsured_age_50_up
 01001,Autauga County,Alabama,55200,4093,1968,769,8.7,9.3,7.1
 01003,Baldwin County,Alabama,208107,19119,9218,4637,11.3,12.9,10.5
 01005,Barbour County,Alabama,25782,2136,846,519,12.2,11.5,11.4

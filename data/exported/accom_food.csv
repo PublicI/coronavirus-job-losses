@@ -1,4 +1,4 @@
-area_fips,county,state,population,pct_uninsured_total,pct_uninsured_below_400_poverty,pct_uninsured_age_50_up,september_employment_accom_food,total_qtrly_wages_accom_food,september_employment_all_industries,total_qtrly_wages_all_industries,september_jobs_per_thousand_accom_food,total_qtrly_wages_lc_accom_food,september_employment_lq_accom_food,total_qtrly_wages_lq_accom_food
+area_fips,county,state,population,pct_uninsured_total,pct_uninsured_138_400_poverty,pct_uninsured_age_50_up,september_employment_accom_food,total_qtrly_wages_accom_food,september_employment_all_industries,total_qtrly_wages_all_industries,september_jobs_per_thousand_accom_food,total_qtrly_wages_lc_accom_food,september_employment_lq_accom_food,total_qtrly_wages_lq_accom_food
 01001,Autauga County,Alabama,55200,8.7,9.3,7.1,1270,4909808,11042,110956184,115,0.04,1.21,1.15
 01003,Baldwin County,Alabama,208107,11.3,12.9,10.5,13639,83327210,75855,732242468,180,0.11,1.89,2.96
 01005,Barbour County,Alabama,25782,12.2,11.5,11.4,684,2371918,8347,75928211,82,0.03,0.86,0.81

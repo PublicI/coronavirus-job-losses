@@ -84,10 +84,10 @@ health_insurance <- read_csv("data/sahie_2017.csv", skip = 79) %>%
               values_from = c("NUI", "PCTUI")) %>% 
   select(area_fips,
          num_uninsured_total = NUI_0_0,
-         num_uninsured_below_400_poverty = NUI_5_0,
+         num_uninsured_138_400_poverty = NUI_5_0,
          num_uninsured_age_50_up = NUI_0_3,
          pct_uninsured_total = PCTUI_0_0,
-         pct_uninsured_below_400_poverty = PCTUI_5_0,
+         pct_uninsured_138_400_poverty = PCTUI_5_0,
          pct_uninsured_age_50_up = PCTUI_0_3)
 
 # Import 2018 county population data from the Census Bureau's American Community Survey
@@ -141,7 +141,7 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
          state,
          population,
          pct_uninsured_total,
-         pct_uninsured_below_400_poverty,
+         pct_uninsured_138_400_poverty,
          pct_uninsured_age_50_up,
          september_employment_transportation,
          total_qtrly_wages_transportation,
@@ -163,7 +163,7 @@ arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops, health_insurance
          state,
          population,
          pct_uninsured_total,
-         pct_uninsured_below_400_poverty,
+         pct_uninsured_138_400_poverty,
          pct_uninsured_age_50_up,
          september_employment_arts_ent_rec,
          total_qtrly_wages_arts_ent_rec,
@@ -185,7 +185,7 @@ accom_food <- list(accom_food, all_industries, county_pops, health_insurance) %>
          state,
          population,
          pct_uninsured_total,
-         pct_uninsured_below_400_poverty,
+         pct_uninsured_138_400_poverty,
          pct_uninsured_age_50_up,
          september_employment_accom_food,
          total_qtrly_wages_accom_food,
@@ -213,7 +213,7 @@ selected_industries <- list(transportation, arts_ent_rec, accom_food) %>%
          state,
          population,
          pct_uninsured_total,
-         pct_uninsured_below_400_poverty,
+         pct_uninsured_138_400_poverty,
          pct_uninsured_age_50_up,
          september_employment_selected_industries,
          total_qtrly_wages_selected_industries,
@@ -232,10 +232,10 @@ health_insurance <- health_insurance %>%
          state,
          population,
          num_uninsured_total,
-         num_uninsured_below_400_poverty,
+         num_uninsured_138_400_poverty,
          num_uninsured_age_50_up,
          pct_uninsured_total,
-         pct_uninsured_below_400_poverty,
+         pct_uninsured_138_400_poverty,
          pct_uninsured_age_50_up)
 
 # Export the data
@@ -353,15 +353,24 @@ save_html(health_insurance_geo_map, file = paste0(getwd(),"/maps/health_insuranc
 ```
 
 ```{r analyze the data, echo = FALSE}
-# What proportion of counties are reliant on these industries for at least 25 percent of their jobs?
-selected_industries %>% 
-  filter(september_jobs_per_thousand_selected_industries >= 250)
+# Which counties are most reliant on these industries for jobs?
+most_reliant <- selected_industries %>% 
+  filter(september_employment_lq_selected_industries > 1)
 
-# How many of these counties are also among the 100 least-insured in 2017?
+# Which 100 counties have the highest rate of uninsured residents under the age of 65?
+most_uninsured <- health_insurance %>% 
+  filter(pct_uninsured_total > 10) # [2018 national rate of uninsurance among residents under the age of 65 = 10%](https://www.census.gov/data/tables/2019/demo/health-insurance/p60-267.html)
 
-# What proportion of states have at least one county that is reliant on these industries for at least 25 percent of their jobs?
-selected_industries %>% 
-  filter(september_jobs_per_thousand_selected_industries >= 250) %>% 
-  group_by(state) %>% 
-  summarize(count = n())
+# Which counties meet both conditions?
+most_reliant_uninsured <- most_reliant %>% 
+  inner_join(most_uninsured, by = "area_fips") %>% 
+  select(area_fips,
+         county = county.x,
+         state = state.x,
+         population = population.x,
+         num_uninsured_total = num_uninsured_total,
+         pct_uninsured_total = pct_uninsured_total.x,
+         september_employment_selected_industries,
+         september_jobs_per_thousand_selected_industries,
+         september_employment_lq_selected_industries)
 ```

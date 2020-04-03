@@ -90,6 +90,56 @@ health_insurance <- read_csv("data/sahie_2017.csv", skip = 79) %>%
          pct_uninsured_138_400_poverty = PCTUI_5_0,
          pct_uninsured_age_50_up = PCTUI_0_3)
 
+# And import it for states
+health_insurance_states <- read_csv("data/sahie_2017.csv", skip = 79) %>% 
+  filter(geocat == "40" & (iprcat == "0" | iprcat == "3") & agecat == "0" & sexcat == "0") %>% 
+  # Reshape the data from "long" to "wide" format
+  pivot_wider(id_cols = statefips,
+              names_from = c("iprcat", "racecat"),
+              values_from = c("NUI", "PCTUI")) %>% 
+  select(state_code = statefips,
+         num_uninsured_total = NUI_0_0,
+         num_uninsured_138_poverty = NUI_3_0,
+         num_uninsured_white = NUI_0_1,
+         num_uninsured_138_poverty_white = NUI_3_1,
+         num_uninsured_black = NUI_0_2,
+         num_uninsured_138_poverty_black = NUI_3_2,
+         num_uninsured_hispanic = NUI_0_3,
+         num_uninsured_138_poverty_hispanic = NUI_3_3,
+         pct_uninsured_total = PCTUI_0_0,
+         pct_uninsured_138_poverty = PCTUI_3_0,
+         pct_uninsured_white = PCTUI_0_1,
+         pct_uninsured_138_poverty_white = PCTUI_3_1,
+         pct_uninsured_black = PCTUI_0_2,
+         pct_uninsured_138_poverty_black = PCTUI_3_2,
+         pct_uninsured_hispanic = PCTUI_0_3,
+         pct_uninsured_138_poverty_hispanic = PCTUI_3_3)
+
+# Add state names
+health_insurance_states <- health_insurance_states %>% 
+  left_join(fips_codes, by = "state_code") %>% 
+  select(state_code,
+         state_name,
+         num_uninsured_total,
+         num_uninsured_138_poverty,
+         num_uninsured_white,
+         num_uninsured_138_poverty_white,
+         num_uninsured_black,
+         num_uninsured_138_poverty_black,
+         num_uninsured_hispanic,
+         num_uninsured_138_poverty_hispanic,
+         pct_uninsured_total,
+         pct_uninsured_138_poverty,
+         pct_uninsured_white,
+         pct_uninsured_138_poverty_white,
+         pct_uninsured_black,
+         pct_uninsured_138_poverty_black,
+         pct_uninsured_hispanic,
+         pct_uninsured_138_poverty_hispanic)
+
+# Remove duplicate rows
+health_insurance_states <- distinct(health_insurance_states)
+
 # Import 2018 county population data from the Census Bureau's American Community Survey
 county_pops <- read_csv("data/acs_pops_2018.csv")
 # Drop the duplicate header row
@@ -154,6 +204,7 @@ transportation <- list(air_transport, rail_transport, water_transport, transit_g
          state,
          population,
          pct_non_white,
+         num_uninsured_total,
          pct_uninsured_total,
          september_employment_transportation,
          september_jobs_per_thousand_transportation,
@@ -174,6 +225,7 @@ arts_ent_rec <- list(arts_ent_rec, all_industries, county_pops, health_insurance
          state,
          population,
          pct_non_white,
+         num_uninsured_total,
          pct_uninsured_total,
          september_employment_arts_ent_rec,
          september_jobs_per_thousand_arts_ent_rec,
@@ -194,6 +246,7 @@ accom_food <- list(accom_food, all_industries, county_pops, health_insurance, ra
          state,
          population,
          pct_non_white,
+         num_uninsured_total,
          pct_uninsured_total,
          september_employment_accom_food,
          september_jobs_per_thousand_accom_food,
@@ -205,7 +258,7 @@ accom_food <- list(accom_food, all_industries, county_pops, health_insurance, ra
 # Join all the selected industries data frames together
 selected_industries <- list(transportation, arts_ent_rec, accom_food) %>% 
   reduce(full_join, by = "area_fips") %>% 
-  mutate(september_employment_selected_industries = select(., 7, 18, 29) %>% 
+  mutate(september_employment_selected_industries = select(., 8, 20, 33) %>% 
            rowSums(na.rm = T),
          september_jobs_per_thousand_selected_industries = round(september_employment_selected_industries / september_employment_all_industries * 1000, digits = 0),
          september_jobs_pct_total_selected_industries = round(september_employment_selected_industries / september_employment_all_industries * 100, digits = 1),
@@ -217,6 +270,7 @@ selected_industries <- list(transportation, arts_ent_rec, accom_food) %>%
          state,
          population,
          pct_non_white,
+         num_uninsured_total,
          pct_uninsured_total,
          september_employment_selected_industries,
          september_jobs_per_thousand_selected_industries,
@@ -278,16 +332,42 @@ more_reliant_uninsured <- more_reliant %>%
          state = state.x,
          population = population.x,
          pct_non_white = pct_non_white.x,
-         num_uninsured_total = num_uninsured_total,
+         num_uninsured_total = num_uninsured_total.x,
          pct_uninsured_total = pct_uninsured_total.x,
          september_employment_selected_industries,
          september_jobs_per_thousand_selected_industries,
          september_employment_lq_selected_industries)
 
-# Which counties have the highest combined reliance and uninsured rate?
+# Which counties have the highest combined reliance on these industries and uninsured rate?
 most_reliant_uninsured <- selected_industries %>% 
   arrange(desc(september_jobs_pct_total_selected_industries_plus_pct_uninsured_total)) %>% 
   head(100)
+
+# What do these numbers look like by state?
+selected_industries_by_state <- selected_industries %>% 
+  mutate(state_code = substr(area_fips, 1, 2))
+         
+selected_industries_by_state <- selected_industries_by_state %>% 
+  left_join(health_insurance_states, by = "state_code", suffix = c("_county", "_state")) %>% 
+  group_by(state) %>% 
+  summarize(september_employment_selected_industries_state = sum(september_employment_selected_industries),
+         september_jobs_per_thousand_selected_industries_state = round((sum(september_employment_selected_industries) / sum(september_employment_all_industries)) * 1000, digits = 0),
+         september_jobs_pct_total_selected_industries_state = round((sum(september_employment_selected_industries) / sum(september_employment_all_industries)) * 100, digits = 1),
+         september_employment_transportation,
+         september_jobs_per_thousand_transportation,
+         september_jobs_pct_total_transportation,
+         september_jobs_pct_total_transportation_plus_pct_uninsured_total,
+         september_employment_arts_ent_rec,
+         september_jobs_per_thousand_arts_ent_rec,
+         september_jobs_pct_arts_ent_rec,
+         september_jobs_pct_arts_ent_rec_plus_pct_uninsured_total,
+         september_employment_accom_food,
+         september_jobs_per_thousand_accom_food,
+         september_jobs_pct_total_accom_food)
+
+
+
+
 
 write_csv(most_reliant_uninsured, "data/exported/most_reliant_uninsured.csv")
 
@@ -305,110 +385,4 @@ more_reliant_uninsured_test <- selected_industries %>%
 write_csv(more_reliant, "data/exported/more_reliant.csv")
 write_csv(more_uninsured, "data/exported/more_uninsured.csv")
 write_csv(more_reliant_uninsured, "data/exported/more_reliant_uninsured.csv")
-```
-
-```{r map data, echo = FALSE}
-# Import US counties shapefile
-counties <- counties(cb = T)
-
-# Join the shapefile to each of the industry data frames plus the health insurance data frame
-transportation_geo <- geo_join(counties, transportation, "GEOID", "area_fips", how = "inner")
-arts_ent_rec_geo <- geo_join(counties, arts_ent_rec, "GEOID", "area_fips", how = "inner")
-accom_food_geo <- geo_join(counties, accom_food, "GEOID", "area_fips", how = "inner")
-selected_industries_geo <- geo_join(counties, selected_industries, "GEOID", "area_fips", how = "inner")
-health_insurance_geo <- geo_join(counties, health_insurance, "GEOID", "area_fips", how = "inner")
-
-# Set variables for the color palettes and popup texts
-transportation_geo_pal <- colorNumeric("Reds", domain = transportation_geo$september_jobs_per_thousand_transportation)
-transportation_geo_popup_text <- paste0(transportation_geo$county, " has ", as.character(transportation_geo$september_jobs_per_thousand_transportation)," transportation jobs per thousand total jobs.")
-
-arts_ent_rec_geo_pal <- colorNumeric("Reds", domain = arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec)
-arts_ent_rec_geo_popup_text <- paste0(arts_ent_rec_geo$county, " has ", as.character(arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec)," arts, entertainment and recreation jobs per thousand total jobs.")
-
-accom_food_geo_pal <- colorNumeric("Reds", domain = accom_food_geo$september_jobs_per_thousand_accom_food)
-accom_food_geo_popup_text <- paste0(accom_food_geo$county, " has ", as.character(accom_food_geo$september_jobs_per_thousand_accom_food)," accomodation and food services jobs per thousand total jobs.")
-
-selected_industries_geo_pal <- colorNumeric("Reds", domain = selected_industries_geo$september_jobs_per_thousand_selected_industries)
-selected_industries_geo_popup_text <- paste0(selected_industries_geo$county, " has ", as.character(selected_industries_geo$september_jobs_per_thousand_selected_industries)," selected industry obs per thousand total jobs.")
-
-health_insurance_geo_pal <- colorNumeric("Reds", domain = health_insurance_geo$pct_uninsured_total)
-health_insurance_geo_popup_text <- paste0(health_insurance_geo$county, " has a ", as.character(health_insurance_geo$pct_uninsured_total),"% uninsured rate.")
-
-# Map the data frames
-transportation_geo_map <- transportation_geo %>% 
-  leaflet() %>% 
-  addTiles() %>% 
-  setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ transportation_geo_pal(transportation_geo$september_jobs_per_thousand_transportation),
-              fillOpacity = 0.5,
-              smoothFactor = 0.5,
-              stroke = F,
-              popup = ~ transportation_geo_popup_text) %>% 
-  addLegend(pal = transportation_geo_pal,
-            values = transportation_geo$september_jobs_per_thousand_transportation,
-            position = "bottomleft",
-            title = "Jobs per thousand in the</br/>transportation industry")
-
-arts_ent_rec_geo_map <- arts_ent_rec_geo %>% 
-  leaflet() %>% 
-  addTiles() %>% 
-  setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ arts_ent_rec_geo_pal(arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec),
-              fillOpacity = 0.5,
-              smoothFactor = 0.5,
-              stroke = F,
-              popup = ~ arts_ent_rec_geo_popup_text) %>% 
-  addLegend(pal = arts_ent_rec_geo_pal,
-            values = arts_ent_rec_geo$september_jobs_per_thousand_arts_ent_rec,
-            position = "bottomleft",
-            title = "Jobs per thousand in the arts,</br/>entertainment and recreation industry")
-
-accom_food_geo_map <- accom_food_geo %>% 
-  leaflet() %>% 
-  addTiles() %>% 
-  setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ accom_food_geo_pal(accom_food_geo$september_jobs_per_thousand_accom_food),
-              fillOpacity = 0.5,
-              smoothFactor = 0.5,
-              stroke = F,
-              popup = ~ accom_food_geo_popup_text) %>% 
-  addLegend(pal = accom_food_geo_pal,
-            values = accom_food_geo$september_jobs_per_thousand_accom_food,
-            position = "bottomleft",
-            title = "Jobs per thousand in the accommodation</br/>and food services industry")
-
-selected_industries_geo_map <- selected_industries_geo %>% 
-  leaflet() %>% 
-  addTiles() %>% 
-  setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ selected_industries_geo_pal(selected_industries_geo$september_jobs_per_thousand_selected_industries),
-              fillOpacity = 0.5,
-              smoothFactor = 0.5,
-              stroke = F,
-              popup = ~ selected_industries_geo_popup_text) %>% 
-  addLegend(pal = selected_industries_geo_pal,
-            values = selected_industries_geo$september_jobs_per_thousand_selected_industries,
-            position = "bottomleft",
-            title = "Jobs per thousand in </br/>selected industries")
-
-health_insurance_geo_map <- health_insurance_geo %>% 
-  leaflet() %>% 
-  addTiles() %>% 
-  setView(-98.483330, 38.712046, zoom = 4) %>% 
-  addPolygons(fillColor = ~ health_insurance_geo_pal(health_insurance_geo$pct_uninsured_total),
-              fillOpacity = 0.5,
-              smoothFactor = 0.5,
-              stroke = F,
-              popup = ~ health_insurance_geo_popup_text) %>% 
-  addLegend(pal = health_insurance_geo_pal,
-            values = health_insurance_geo$pct_uninsured_total,
-            position = "bottomleft",
-            title = "Under-65 uninsured rate")
-
-# Export the maps
-save_html(transportation_geo_map, file = paste0(getwd(),"/maps/transportation_geo_map.html"), background = "white")
-save_html(arts_ent_rec_geo_map, file = paste0(getwd(),"/maps/arts_ent_rec_geo_map.html"), background = "white")
-save_html(accom_food_geo_map, file = paste0(getwd(),"/maps/accom_food_geo_map.html"), background = "white")
-save_html(selected_industries_geo_map, file = paste0(getwd(),"/maps/selected_industries_geo_map.html"), background = "white")
-save_html(health_insurance_geo_map, file = paste0(getwd(),"/maps/health_insurance_geo_map.html"), background = "white")
 ```

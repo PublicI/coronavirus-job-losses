@@ -112,12 +112,20 @@ states_health_insurance <- read_csv("data/sahie_2017.csv", skip = 79) %>%
          pct_uninsured_non_white,
          pct_uninsured_black = PCTUI_black_all_incomes,
          pct_uninsured_hispanic = PCTUI_hispanic_all_incomes)
+
+# Import data on Medicaid expansion from (Kaiser Health News)[https://www.kff.org/health-reform/state-indicator/state-activity-around-expanding-medicaid-under-the-affordable-care-act/?currentTimeframe=0&sortModel=%7B%22colId%22:%22Location%22,%22sort%22:%22asc%22%7D]
+medicaid_expansion <- read_csv("data/medicaid_expansion.csv", skip = 2, n_max = 52) %>% 
+  select(state_name = Location,
+         med_exp_status = "Status of Medicaid Expansion Decision")
 ```
 
 ```{r reshape data, echo = FALSE}
-# Set variables for nationwide employment figures
+# Set variables for nationwide employment, insurance and race figures
 us_employment_leisure_hospitality = 16575977 # https://data.bls.gov/cew/apps/table_maker/v4/table_maker.htm#type=1&year=2019&qtr=3&own=5&ind=1026&supp=1
 us_employment_all_industries = 148556525 # https://data.bls.gov/cew/apps/table_maker/v4/table_maker.htm#type=1&year=2019&qtr=3&own=0&ind=10&supp=1
+us_employment_leisure_hospitality_lq = us_employment_leisure_hospitality / us_employment_all_industries
+us_pct_uninsured_total = 10.0 # https://www.census.gov/data/tables/2019/demo/health-insurance/p60-267.html
+us_pct_non_white = 38.9 # https://data.census.gov/cedsci/table?g=0100000US&tid=ACSDP5Y2018.DP05&y=2018&d=ACS%205-Year%20Estimates%20Data%20Profiles&vintage=2018&t=Race%20and%20Ethnicity&hidePreview=false&layer=VT_2018_040_00_PY_D1&cid=DP05_0001E
 
 # Join the county-level leisure and hospitality and health insurance data frames
 counties_leisure_hospitality_insurance <- list(counties_leisure_hospitality, counties_all_industries, counties_health_insurance, race) %>% 
@@ -139,10 +147,11 @@ counties_leisure_hospitality_insurance <- list(counties_leisure_hospitality, cou
 # Join the state-level leisure and hospitality and health insurance data frames
 states_leisure_hospitality_insurance <- list(states_leisure_hospitality, states_all_industries, states_health_insurance) %>% 
   reduce(full_join, by = "area_fips") %>% 
+  left_join(medicaid_expansion, by = "state_name") %>% 
   mutate(employment_leisure_hospitality_pct_total = round(employment_leisure_hospitality / employment_all_industries * 100, digits = 1),
          employment_plus_uninsured = employment_leisure_hospitality_pct_total + pct_uninsured_total) %>% 
   filter(!is.na(employment_leisure_hospitality_pct_total)) %>% 
-    select(1, 5, 12:17, 2, 18:19, 3)
+    select(1, 5, 18, 12:17, 2, 19:20, 3)
 
 # Export the data
 write_csv(counties_leisure_hospitality_insurance, "data/exported/counties_leisure_hospitality_insurance.csv")
@@ -150,73 +159,68 @@ write_csv(states_leisure_hospitality_insurance, "data/exported/states_leisure_ho
 ```
 
 ```{r analyze the data, echo = FALSE}
-# Which counties are more reliant on these industries for jobs than the nation as a whole?
-more_reliant <- selected_industries %>% 
-  filter(september_employment_lq_selected_industries > 1)
+# How many counties are more reliant on leisure and hospitality for jobs than the nation as a whole?
+counties_leisure_hospitality_insurance %>% 
+  filter(employment_leisure_hospitality_lq > 1) %>% 
+  summarize(count = n())
 
-# Which counties have a rate of uninsured residents higher than the nation as a whole?
-more_uninsured <- health_insurance %>% 
-  filter(pct_uninsured_total > 10) # [2018 national rate of uninsurance among residents under the age of 65 = 10%](https://www.census.gov/data/tables/2019/demo/health-insurance/p60-267.html)
+# How many counties have a rate of uninsured residents higher than the nation as a whole?
+counties_leisure_hospitality_insurance %>% 
+  filter(pct_uninsured_total > us_pct_uninsured_total ) %>% 
+  summarize(count = n())
 
 # Which counties meet both conditions?
-more_reliant_uninsured <- more_reliant %>% 
-  inner_join(more_uninsured, by = "area_fips") %>% 
-  select(area_fips,
-         county = county.x,
-         state = state.x,
-         population = population.x,
-         pct_non_white = pct_non_white.x,
-         num_uninsured_total = num_uninsured_total.x,
-         pct_uninsured_total = pct_uninsured_total.x,
-         september_employment_selected_industries,
-         september_jobs_per_thousand_selected_industries,
-         september_employment_lq_selected_industries)
+counties_more_reliant_higher_uninsured <- counties_leisure_hospitality_insurance %>% 
+  filter(employment_leisure_hospitality_lq > 1 & pct_uninsured_total > us_pct_uninsured_total)
 
-# Which counties have the highest combined reliance on these industries and uninsured rate?
-most_reliant_uninsured <- selected_industries %>% 
-  arrange(desc(september_jobs_pct_total_selected_industries_plus_pct_uninsured_total)) %>% 
-  head(100)
+# Of these counties, which have a higher non-white population than the nation as a whole?
+counties_more_reliant_higher_uninsured_higher_non_white <- counties_more_reliant_higher_uninsured %>% 
+  filter(pct_non_white > us_pct_non_white)
 
-# What do these numbers look like by state?
-selected_industries_by_state <- selected_industries %>% 
-  mutate(state_code = substr(area_fips, 1, 2))
-         
-selected_industries_by_state <- selected_industries_by_state %>% 
-  left_join(health_insurance_states, by = "state_code", suffix = c("_county", "_state")) %>% 
-  group_by(state) %>% 
-  summarize(september_employment_selected_industries_state = sum(september_employment_selected_industries),
-         september_jobs_per_thousand_selected_industries_state = round((sum(september_employment_selected_industries) / sum(september_employment_all_industries)) * 1000, digits = 0),
-         september_jobs_pct_total_selected_industries_state = round((sum(september_employment_selected_industries) / sum(september_employment_all_industries)) * 100, digits = 1),
-         september_employment_transportation,
-         september_jobs_per_thousand_transportation,
-         september_jobs_pct_total_transportation,
-         september_jobs_pct_total_transportation_plus_pct_uninsured_total,
-         september_employment_arts_ent_rec,
-         september_jobs_per_thousand_arts_ent_rec,
-         september_jobs_pct_arts_ent_rec,
-         september_jobs_pct_arts_ent_rec_plus_pct_uninsured_total,
-         september_employment_accom_food,
-         september_jobs_per_thousand_accom_food,
-         september_jobs_pct_total_accom_food)
+# In which states are these counties?
+counties_more_reliant_higher_uninsured_higher_non_white %>% 
+  group_by(state_name) %>% 
+  summarize(count = n()) %>% 
+  arrange(desc(count))
 
+# Which states meet both conditions?
+states_more_reliant_higher_uninsured <- states_leisure_hospitality_insurance %>% 
+  filter(employment_leisure_hospitality_lq > 1 & pct_uninsured_total > us_pct_uninsured_total)
 
+# Are there notable racial disparities in terms of the uninsured rate in these states?
+states_leisure_hospitality_insurance %>% 
+  filter(pct_uninsured_non_white < pct_uninsured_white) # Total non-white
+states_leisure_hospitality_insurance %>% 
+  filter(pct_uninsured_black < pct_uninsured_white) # Black
+states_leisure_hospitality_insurance %>% 
+  filter(pct_uninsured_hispanic < pct_uninsured_white) # Hispanic
+states_leisure_hospitality_insurance %>% 
+  summarize(median(pct_uninsured_white - pct_uninsured_non_white, na.rm = T)) # Median disparity between white and non-white uninsured rate
+states_leisure_hospitality_insurance %>% 
+  filter(med_exp_status == "Adopted") %>% 
+  summarize(median(pct_uninsured_white - pct_uninsured_non_white, na.rm = T)) # Median disparity between white and non-white uninsured rate in expansion states
+states_leisure_hospitality_insurance %>% 
+  filter(med_exp_status == "Not Adopted") %>% 
+  summarize(median(pct_uninsured_white - pct_uninsured_non_white, na.rm = T)) # Median disparity between white and non-white uninsured rate in non-expansion states
 
-
-
-write_csv(most_reliant_uninsured, "data/exported/most_reliant_uninsured.csv")
+# Are there notable income disparities in terms of the uninsured rate in these states?
+states_leisure_hospitality_insurance %>% 
+  filter(pct_uninsured_total > pct_uninsured_138_below_poverty)
+states_leisure_hospitality_insurance %>% 
+  filter(med_exp_status == "Adopted") %>% 
+  summarize(median(pct_uninsured_total - pct_uninsured_138_below_poverty, na.rm = T)) # Median disparity between total and 138 percent and below poverty uninsured rate in expansion states
+states_leisure_hospitality_insurance %>% 
+  filter(med_exp_status == "Not Adopted") %>% 
+  summarize(median(pct_uninsured_total - pct_uninsured_138_below_poverty, na.rm = T)) # Median disparity between total and 138 percent and below poverty uninsured rate in non-expansion states
 
 # Do counties with a larger proportion of non-white residents tend to have higher uninsured rates?
-attach(health_insurance)
+attach(counties_leisure_hospitality_insurance)
 plot(pct_non_white, pct_uninsured_total, main = "Percent Non-White vs. Percent Uninsured",
    xlab="Percent Non-White", ylab="Percent Uninsured", pch=19)
 abline(lm(pct_uninsured_total ~ pct_non_white), col = "red") # regression line (y~x)
 
-# Which counties have the highest ratio of jobs-per-thousand to percentage uninsured?
-more_reliant_uninsured_test <- selected_industries %>% 
-  mutate(september_jobs_per_thousand_to_pct_uninsured = september_jobs_per_thousand_selected_industries / pct_uninsured_total)
-
 # Export the data
-write_csv(more_reliant, "data/exported/more_reliant.csv")
-write_csv(more_uninsured, "data/exported/more_uninsured.csv")
-write_csv(more_reliant_uninsured, "data/exported/more_reliant_uninsured.csv")
+write_csv(counties_more_reliant_higher_uninsured, "data/exported/counties_more_reliant_higher_uninsured.csv")
+write_csv(counties_more_reliant_higher_uninsured_higher_non_white, "data/exported/counties_more_reliant_higher_uninsured_higher_non_white.csv")
+write_csv(states_more_reliant_higher_uninsured, "data/exported/states_more_reliant_higher_uninsured.csv")
 ```

@@ -159,33 +159,27 @@ write_csv(states_leisure_hospitality_insurance, "data/exported/states_leisure_ho
 ```
 
 ```{r analyze the data, echo = FALSE}
-# How many counties are more reliant on leisure and hospitality for jobs than the nation as a whole?
+# How many counties with a population of at least 50,000 are at least as reliant on leisure and hospitality for jobs as the nation as a whole?
 counties_leisure_hospitality_insurance %>% 
-  filter(employment_leisure_hospitality_lq > 1) %>% 
+  filter(pop_total >= 50000 & employment_leisure_hospitality_lq >= 1) %>% 
   summarize(count = n())
 
-# How many counties have a rate of uninsured residents higher than the nation as a whole?
+# How many counties with a population of at least 50,000 have a rate of uninsured residents at least as high as the nation as a whole?
 counties_leisure_hospitality_insurance %>% 
-  filter(pct_uninsured_total > us_pct_uninsured_total ) %>% 
+  filter(pop_total >= 50000 & pct_uninsured_total >= us_pct_uninsured_total ) %>% 
   summarize(count = n())
 
 # Which counties meet both conditions?
 counties_more_reliant_higher_uninsured <- counties_leisure_hospitality_insurance %>% 
-  filter(employment_leisure_hospitality_lq > 1 & pct_uninsured_total > us_pct_uninsured_total)
+  filter(pop_total >= 50000 & employment_leisure_hospitality_lq >= 1 & pct_uninsured_total >= us_pct_uninsured_total)
 
-# Of these counties, which have a higher non-white population than the nation as a whole?
+# Of these counties, which have a non-white population than is at least as great as the nation as a whole?
 counties_more_reliant_higher_uninsured_higher_non_white <- counties_more_reliant_higher_uninsured %>% 
-  filter(pct_non_white > us_pct_non_white)
-
-# In which states are these counties?
-counties_more_reliant_higher_uninsured_higher_non_white %>% 
-  group_by(state_name) %>% 
-  summarize(count = n()) %>% 
-  arrange(desc(count))
+  filter(pop_total >= 50000 & pct_non_white >= us_pct_non_white)
 
 # Which states meet both conditions?
 states_more_reliant_higher_uninsured <- states_leisure_hospitality_insurance %>% 
-  filter(employment_leisure_hospitality_lq > 1 & pct_uninsured_total > us_pct_uninsured_total)
+  filter(employment_leisure_hospitality_lq >= 1 & pct_uninsured_total >= us_pct_uninsured_total)
 
 # Are there notable racial disparities in terms of the uninsured rate in these states?
 states_leisure_hospitality_insurance %>% 

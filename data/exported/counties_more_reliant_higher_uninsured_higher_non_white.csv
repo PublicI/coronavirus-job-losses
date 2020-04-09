@@ -1,0 +1,83 @@
+area_fips,county_name,state_name,pop_total,pct_non_white,pct_uninsured_total,employment_leisure_hospitality,employment_leisure_hospitality_pct_total,employment_plus_uninsured,employment_leisure_hospitality_lq
+01113,Russell County,Alabama,58213,53,12,1735,12.2,24.2,1.09
+02020,Anchorage Borough,Alaska,296112,41.5,12.1,18110,12,24.1,1.08
+04005,Coconino County,Arizona,140217,45.9,13.1,16512,25.6,38.7,2.29
+04017,Navajo County,Arizona,108705,58.5,14.4,3982,14.4,28.8,1.29
+04019,Pima County,Arizona,1019722,47.9,12.3,43987,11.7,24,1.05
+06037,Los Angeles County,California,10098052,73.7,10.2,546412,12.1,22.299999999999997,1.09
+06053,Monterey County,California,433212,69.7,11.9,26512,12.4,24.3,1.11
+06083,Santa Barbara County,California,443738,55.1,11.5,28645,13.7,25.2,1.23
+08031,Denver County,Colorado,693417,46.3,10.3,67831,12.7,23,1.14
+12011,Broward County,Florida,1909151,62.8,16.8,93635,11.4,28.200000000000003,1.02
+12057,Hillsborough County,Florida,1378883,50.5,14.7,80546,11.4,26.1,1.02
+12073,Leon County,Florida,288102,43.2,11.7,19558,12.8,24.5,1.15
+12086,Miami-Dade County,Florida,2715516,86.6,19.5,142351,12.3,31.8,1.1
+12095,Orange County,Florida,1321194,59.2,14.8,217295,25,39.8,2.24
+12097,Osceola County,Florida,338619,67.1,15.1,20910,20.9,36,1.88
+12099,Palm Beach County,Florida,1446277,44.7,17.9,84148,13.9,31.799999999999997,1.24
+12111,St. Lucie County,Florida,305591,42,17.9,9649,12.1,30,1.08
+13021,Bibb County,Georgia,153490,61.2,16,9303,11.3,27.3,1.01
+13051,Chatham County,Georgia,287049,51.1,16.5,24420,15.6,32.1,1.4
+13059,Clarke County,Georgia,124602,44.7,18.2,9829,13.8,32,1.23
+13097,Douglas County,Georgia,141840,58.1,14.9,5560,12.2,27.1,1.1
+13121,Fulton County,Georgia,1021902,60.2,13.7,102527,11.4,25.1,1.02
+13151,Henry County,Georgia,221307,54.9,13.7,9538,14.4,28.1,1.29
+13153,Houston County,Georgia,151682,43.1,12,8139,12.9,24.9,1.16
+13179,Liberty County,Georgia,62108,60.4,13.1,2283,12,25.1,1.08
+13185,Lowndes County,Georgia,114582,45.7,17.5,7365,14.9,32.4,1.33
+13215,Muscogee County,Georgia,196670,59.3,14.5,12253,13.1,27.6,1.17
+13245,Richmond County,Georgia,201463,64.9,16,12595,12.1,28.1,1.08
+17031,Cook County,Illinois,5223719,57.5,10.2,295885,11.3,21.5,1.01
+22051,Jefferson Parish,Louisiana,435300,46.9,12,24764,13.2,25.2,1.18
+24033,Prince George's County,Maryland,906202,87,11.1,35644,11.2,22.299999999999997,1
+28035,Forrest County,Mississippi,75517,43,15.4,4822,11.9,27.3,1.07
+28075,Lauderdale County,Mississippi,77323,47.3,12.9,3949,12.1,25,1.08
+28087,Lowndes County,Mississippi,59437,48.1,14.3,3157,12.3,26.6,1.1
+29510,St. Louis city,Missouri,311273,56.8,12.6,26444,11.4,24,1.02
+32003,Clark County,Nevada,2141574,56.5,13,292769,28.5,41.5,2.56
+35001,Bernalillo County,New Mexico,677692,61,10.7,39444,11.8,22.5,1.06
+35005,Chaves County,New Mexico,65459,60.5,11.6,2957,14,25.6,1.25
+35009,Curry County,New Mexico,50199,51.8,10.9,1992,11.7,22.6,1.05
+35013,Dona Ana County,New Mexico,215338,72.5,12.6,8579,11.6,24.2,1.04
+35031,McKinley County,New Mexico,72849,91.2,16,2933,13.9,29.9,1.25
+35043,Sandoval County,New Mexico,140769,56,10.4,3603,11.2,21.6,1
+35049,Santa Fe County,New Mexico,148917,57.3,13.7,11823,18.8,32.5,1.68
+37051,Cumberland County,North Carolina,332106,56,10.7,16298,13.6,24.299999999999997,1.22
+37067,Forsyth County,North Carolina,371573,43,12.8,21544,11.3,24.1,1.01
+37083,Halifax County,North Carolina,51737,61.5,13.3,2033,13.2,26.5,1.18
+37119,Mecklenburg County,North Carolina,1054314,52.7,13,81640,11.4,24.4,1.02
+37127,Nash County,North Carolina,94003,49.6,12.1,4561,11.3,23.4,1.01
+37147,Pitt County,North Carolina,177372,45.3,11.8,9699,12.5,24.3,1.12
+37183,Wake County,North Carolina,1046558,39.7,10,65629,11.4,21.4,1.02
+40031,Comanche County,Oklahoma,122561,43.5,13.9,5106,12.2,26.1,1.09
+40109,Oklahoma County,Oklahoma,782051,43.6,16.8,53292,11.4,28.200000000000003,1.03
+45041,Florence County,South Carolina,138561,47.8,12.3,8249,12.4,24.700000000000003,1.11
+45075,Orangeburg County,South Carolina,88454,66.8,12.7,3596,12.6,25.299999999999997,1.13
+45079,Richland County,South Carolina,408263,57.2,10.9,25161,11.2,22.1,1
+47037,Davidson County,Tennessee,684017,43.8,14,70072,13.5,27.5,1.21
+48021,Bastrop County,Texas,82577,47,21.8,2855,15.3,37.1,1.37
+48027,Bell County,Texas,342236,53.6,15.1,13791,11.4,26.5,1.02
+48029,Bexar County,Texas,1925865,72,17.8,117103,13.3,31.1,1.19
+48039,Brazoria County,Texas,353999,51.9,16.4,13533,11.6,28,1.04
+48041,Brazos County,Texas,219193,43.9,16.8,16876,15.5,32.3,1.39
+48061,Cameron County,Texas,421750,90.9,30.2,16566,11.7,41.9,1.05
+48085,Collin County,Texas,944350,42,12.5,50959,11.8,24.3,1.06
+48099,Coryell County,Texas,75389,41,15.2,1879,11.7,26.9,1.05
+48121,Denton County,Texas,807047,40,13,35202,13.5,26.5,1.21
+48135,Ector County,Texas,158342,66.6,21.4,9046,11.2,32.599999999999994,1
+48141,El Paso County,Texas,837654,87.8,23.8,37983,12.1,35.9,1.09
+48157,Fort Bend County,Texas,739342,66.3,13.2,27314,14,27.2,1.25
+48167,Galveston County,Texas,327089,42.3,17.4,19220,17.5,34.9,1.56
+48209,Hays County,Texas,204150,45.5,17.6,10657,14.5,32.1,1.3
+48303,Lubbock County,Texas,301454,46,15.6,20620,14.6,30.2,1.31
+48347,Nacogdoches County,Texas,65558,40.4,20.9,3017,13.5,34.4,1.21
+48355,Nueces County,Texas,360486,70.1,20.3,22288,13.6,33.9,1.22
+48375,Potter County,Texas,120899,55.5,24.5,8894,11.5,36,1.03
+48409,San Patricio County,Texas,67046,61.2,17.7,2384,12.8,30.5,1.15
+48439,Tarrant County,Texas,2019977,52.6,19,111447,12.1,31.1,1.08
+48451,Tom Green County,Texas,117466,46.2,16.8,6102,12.8,29.6,1.14
+48453,Travis County,Texas,1203166,50.9,14.8,97437,12.5,27.3,1.12
+48469,Victoria County,Texas,91970,55,18.3,4322,11.2,29.5,1
+48479,Webb County,Texas,272053,96.5,29.8,11508,11.2,41,1
+48491,Williamson County,Texas,527057,39.9,12.4,23157,12.8,25.200000000000003,1.14
+51153,Prince William County,Virginia,456749,56.3,11.7,17408,13.1,24.799999999999997,1.17

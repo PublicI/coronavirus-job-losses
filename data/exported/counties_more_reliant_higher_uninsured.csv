@@ -1,0 +1,240 @@
+area_fips,county_name,state_name,pop_total,pct_non_white,pct_uninsured_total,employment_leisure_hospitality,employment_leisure_hospitality_pct_total,employment_plus_uninsured,employment_leisure_hospitality_lq
+01001,Autauga County,Alabama,55200,25,10,1564,14.2,24.2,1.27
+01003,Baldwin County,Alabama,208107,17,13.2,15591,20.6,33.8,1.84
+01015,Calhoun County,Alabama,115098,27.5,11.1,5215,11.7,22.799999999999997,1.05
+01069,Houston County,Alabama,104352,33.1,12.7,5745,11.7,24.4,1.05
+01077,Lauderdale County,Alabama,92585,15.2,11.7,4491,15.2,26.9,1.36
+01081,Lee County,Alabama,159287,32.6,10.5,9467,15.5,26,1.38
+01113,Russell County,Alabama,58213,53,12,1735,12.2,24.2,1.09
+01115,St. Clair County,Alabama,87306,14,11.5,2451,12.3,23.8,1.1
+01125,Tuscaloosa County,Alabama,206213,38,10.1,11484,11.7,21.799999999999997,1.05
+01127,Walker County,Alabama,64493,10.9,13,2131,11.6,24.6,1.04
+02020,Anchorage Borough,Alaska,296112,41.5,12.1,18110,12,24.1,1.08
+02090,Fairbanks North Star Borough,Alaska,99653,29.6,12.3,4672,12.3,24.6,1.1
+02122,Kenai Peninsula Borough,Alaska,58220,19.4,15.5,3148,15,30.5,1.35
+02170,Matanuska-Susitna Borough,Alaska,103464,20.5,15.1,3595,14.1,29.2,1.27
+04005,Coconino County,Arizona,140217,45.9,13.1,16512,25.6,38.7,2.29
+04007,Gila County,Arizona,53400,37.6,14.5,1966,13.1,27.6,1.17
+04015,Mohave County,Arizona,206064,22.4,12.8,7530,14.7,27.5,1.32
+04017,Navajo County,Arizona,108705,58.5,14.4,3982,14.4,28.8,1.29
+04019,Pima County,Arizona,1019722,47.9,12.3,43987,11.7,24,1.05
+04025,Yavapai County,Arizona,224645,19.3,15.1,10616,16.2,31.299999999999997,1.45
+05051,Garland County,Arkansas,98296,17.7,10.4,7203,19.1,29.5,1.71
+05143,Washington County,Arkansas,228529,28.6,12.4,13900,12.5,24.9,1.12
+06037,Los Angeles County,California,10098052,73.7,10.2,546412,12.1,22.299999999999997,1.09
+06045,Mendocino County,California,87422,34.4,10,4528,13.7,23.7,1.23
+06053,Monterey County,California,433212,69.7,11.9,26512,12.4,24.3,1.11
+06083,Santa Barbara County,California,443738,55.1,11.5,28645,13.7,25.2,1.23
+08031,Denver County,Colorado,693417,46.3,10.3,67831,12.7,23,1.14
+08037,Eagle County,Colorado,54357,32.8,12.5,10404,31.5,44,2.82
+08045,Garfield County,Colorado,58538,31.5,13.9,3964,15,28.9,1.34
+08067,La Plata County,Colorado,55101,21.3,10.2,4462,16.8,27,1.51
+08077,Mesa County,Colorado,149998,18.5,10.2,8219,12.8,23,1.14
+12001,Alachua County,Florida,263148,38.5,11.6,15923,11.8,23.4,1.06
+12005,Bay County,Florida,182482,23.5,15,12745,17.1,32.1,1.53
+12009,Brevard County,Florida,576808,25.2,13.4,27731,12.5,25.9,1.12
+12011,Broward County,Florida,1909151,62.8,16.8,93635,11.4,28.200000000000003,1.02
+12015,Charlotte County,Florida,176954,15.9,15.9,7203,15.1,31,1.35
+12017,Citrus County,Florida,143087,11.7,15.3,4458,13.8,29.1,1.24
+12019,Clay County,Florida,207291,26.6,12.4,7929,14.7,27.1,1.32
+12021,Collier County,Florida,363922,36.7,22.6,26768,18.4,41,1.65
+12023,Columbia County,Florida,69105,27.3,13.2,3066,12.3,25.5,1.11
+12033,Escambia County,Florida,311522,35.4,12.9,18669,13.5,26.4,1.21
+12035,Flagler County,Florida,107139,25.1,15.2,4236,17.6,32.8,1.58
+12053,Hernando County,Florida,182696,21.6,15.7,6087,13.5,29.2,1.21
+12055,Highlands County,Florida,102101,32.4,19.4,3363,12.5,31.9,1.12
+12057,Hillsborough County,Florida,1378883,50.5,14.7,80546,11.4,26.1,1.02
+12061,Indian River County,Florida,150984,24.4,18.2,7591,14.5,32.7,1.3
+12069,Lake County,Florida,335362,29.4,15.3,14030,13.9,29.200000000000003,1.24
+12071,Lee County,Florida,718679,32.2,19.3,39558,15,34.3,1.34
+12073,Leon County,Florida,288102,43.2,11.7,19558,12.8,24.5,1.15
+12081,Manatee County,Florida,373853,28.5,17.1,19401,15.2,32.3,1.36
+12083,Marion County,Florida,348371,29.2,17.6,12626,12,29.6,1.08
+12085,Martin County,Florida,157581,21.4,16,9817,14.4,30.4,1.29
+12086,Miami-Dade County,Florida,2715516,86.6,19.5,142351,12.3,31.8,1.1
+12087,Monroe County,Florida,76325,33.1,19.6,14112,35,54.6,3.13
+12089,Nassau County,Florida,80578,12.6,11.3,5318,22.4,33.7,2.01
+12091,Okaloosa County,Florida,200737,26.1,13.2,15067,17.6,30.8,1.58
+12095,Orange County,Florida,1321194,59.2,14.8,217295,25,39.8,2.24
+12097,Osceola County,Florida,338619,67.1,15.1,20910,20.9,36,1.88
+12099,Palm Beach County,Florida,1446277,44.7,17.9,84148,13.9,31.799999999999997,1.24
+12101,Pasco County,Florida,510593,24.4,14.8,16256,13.3,28.1,1.19
+12103,Pinellas County,Florida,957875,25.7,15.2,58318,13.3,28.5,1.19
+12109,St. Johns County,Florida,235503,16.9,10.8,15226,19.3,30.1,1.73
+12111,St. Lucie County,Florida,305591,42,17.9,9649,12.1,30,1.08
+12113,Santa Rosa County,Florida,170442,17.4,11.9,6514,16.2,28.1,1.45
+12115,Sarasota County,Florida,412144,16.6,16.6,23452,13.8,30.400000000000002,1.24
+12119,Sumter County,Florida,120999,15.1,12.1,4276,13.6,25.7,1.22
+12127,Volusia County,Florida,527634,27.7,15.6,27683,16,31.6,1.43
+12131,Walton County,Florida,65858,15.6,16.9,7118,26,42.9,2.33
+13013,Barrow County,Georgia,76887,27.8,17.8,2352,11.7,29.5,1.05
+13015,Bartow County,Georgia,103620,22.1,17.3,4801,11.7,29,1.05
+13021,Bibb County,Georgia,153490,61.2,16,9303,11.3,27.3,1.01
+13031,Bulloch County,Georgia,74782,36.3,15.9,3675,14.2,30.1,1.27
+13039,Camden County,Georgia,52714,30.1,14.2,1921,13.5,27.7,1.21
+13045,Carroll County,Georgia,116022,29.4,15.2,5175,12.4,27.6,1.11
+13047,Catoosa County,Georgia,66299,8.8,13.9,2608,16.8,30.700000000000003,1.51
+13051,Chatham County,Georgia,287049,51.1,16.5,24420,15.6,32.1,1.4
+13057,Cherokee County,Georgia,241910,20.6,14.1,9708,14.8,28.9,1.32
+13059,Clarke County,Georgia,124602,44.7,18.2,9829,13.8,32,1.23
+13073,Columbia County,Georgia,147295,30.5,10.2,5227,14.4,24.6,1.29
+13077,Coweta County,Georgia,140516,28.6,13.9,5479,13.4,27.3,1.2
+13097,Douglas County,Georgia,141840,58.1,14.9,5560,12.2,27.1,1.1
+13113,Fayette County,Georgia,111369,36.9,10.8,6971,15.4,26.200000000000003,1.38
+13115,Floyd County,Georgia,96824,28.8,17.2,4561,11.5,28.7,1.03
+13121,Fulton County,Georgia,1021902,60.2,13.7,102527,11.4,25.1,1.02
+13127,Glynn County,Georgia,83974,36.3,17.6,8510,21.9,39.5,1.97
+13151,Henry County,Georgia,221307,54.9,13.7,9538,14.4,28.1,1.29
+13153,Houston County,Georgia,151682,43.1,12,8139,12.9,24.9,1.16
+13179,Liberty County,Georgia,62108,60.4,13.1,2283,12,25.1,1.08
+13185,Lowndes County,Georgia,114582,45.7,17.5,7365,14.9,32.4,1.33
+13215,Muscogee County,Georgia,196670,59.3,14.5,12253,13.1,27.6,1.17
+13223,Paulding County,Georgia,155840,27.9,13.7,3996,15.6,29.299999999999997,1.4
+13245,Richmond County,Georgia,201463,64.9,16,12595,12.1,28.1,1.08
+16005,Bannock County,Idaho,85065,16,12.5,4180,11.9,24.4,1.07
+16019,Bonneville County,Idaho,112397,16.8,11.5,6592,12.2,23.7,1.09
+16055,Kootenai County,Idaho,153605,9.2,12.4,10388,15.9,28.3,1.43
+17031,Cook County,Illinois,5223719,57.5,10.2,295885,11.3,21.5,1.01
+20155,Reno County,Kansas,63101,15.8,10.6,3128,11.5,22.1,1.03
+22051,Jefferson Parish,Louisiana,435300,46.9,12,24764,13.2,25.2,1.18
+23009,Hancock County,Maine,54541,5.1,12.1,5335,21.4,33.5,1.92
+23017,Oxford County,Maine,57325,4.6,11.8,2745,16.4,28.2,1.47
+24033,Prince George's County,Maryland,906202,87,11.1,35644,11.2,22.299999999999997,1
+28033,DeSoto County,Mississippi,176132,34.5,12.1,9364,14.7,26.799999999999997,1.32
+28035,Forrest County,Mississippi,75517,43,15.4,4822,11.9,27.3,1.07
+28047,Harrison County,Mississippi,202626,35.8,15.9,24150,27.8,43.7,2.49
+28071,Lafayette County,Mississippi,53459,30,14.2,5011,19.7,33.9,1.77
+28073,Lamar County,Mississippi,61223,25.6,12.7,3477,17.9,30.599999999999998,1.61
+28075,Lauderdale County,Mississippi,77323,47.3,12.9,3949,12.1,25,1.08
+28087,Lowndes County,Mississippi,59437,48.1,14.3,3157,12.3,26.6,1.1
+28109,Pearl River County,Mississippi,55149,18.1,15.1,1305,12.3,27.4,1.1
+28121,Rankin County,Mississippi,151240,25.6,10.6,7955,12.6,23.2,1.13
+29019,Boone County,Missouri,176515,21,10.6,12163,12.8,23.4,1.15
+29031,Cape Girardeau County,Missouri,78324,13.8,11.4,5017,12.1,23.5,1.08
+29037,Cass County,Missouri,102678,11.7,10.2,3787,13.9,24.1,1.24
+29043,Christian County,Missouri,84275,6.5,11.1,2559,14.2,25.299999999999997,1.27
+29095,Jackson County,Missouri,692003,37.7,12.5,43897,11.7,24.2,1.05
+29099,Jefferson County,Missouri,223302,5.5,11,6350,13.2,24.2,1.18
+29101,Johnson County,Missouri,53689,14,10.4,1982,12.4,22.8,1.11
+29169,Pulaski County,Missouri,52591,30.5,10.8,2596,19.9,30.7,1.79
+29213,Taney County,Missouri,54720,11,16.7,11682,38.9,55.599999999999994,3.49
+29510,St. Louis city,Missouri,311273,56.8,12.6,26444,11.4,24,1.02
+32003,Clark County,Nevada,2141574,56.5,13,292769,28.5,41.5,2.56
+32007,Elko County,Nevada,52252,33.1,11.7,5721,25.6,37.3,2.29
+32019,Lyon County,Nevada,53155,24.4,13.1,1633,12.8,25.9,1.14
+32031,Washoe County,Nevada,450486,36.6,12.5,39486,17.4,29.9,1.56
+32510,Carson City,Nevada,54467,32.5,13.5,3735,12.1,25.6,1.09
+35001,Bernalillo County,New Mexico,677692,61,10.7,39444,11.8,22.5,1.06
+35005,Chaves County,New Mexico,65459,60.5,11.6,2957,14,25.6,1.25
+35009,Curry County,New Mexico,50199,51.8,10.9,1992,11.7,22.6,1.05
+35013,Dona Ana County,New Mexico,215338,72.5,12.6,8579,11.6,24.2,1.04
+35031,McKinley County,New Mexico,72849,91.2,16,2933,13.9,29.9,1.25
+35043,Sandoval County,New Mexico,140769,56,10.4,3603,11.2,21.6,1
+35049,Santa Fe County,New Mexico,148917,57.3,13.7,11823,18.8,32.5,1.68
+37001,Alamance County,North Carolina,160576,35.4,13.8,8255,13.2,27,1.18
+37019,Brunswick County,North Carolina,126860,18.2,13.7,6475,19.4,33.099999999999994,1.74
+37021,Buncombe County,North Carolina,254474,16.4,12.5,22798,16.9,29.4,1.51
+37025,Cabarrus County,North Carolina,201448,33.2,10.6,13598,17.8,28.4,1.59
+37031,Carteret County,North Carolina,68920,13.6,13.3,5000,21.1,34.400000000000006,1.89
+37037,Chatham County,North Carolina,69791,28.5,13.4,1836,11.8,25.200000000000003,1.06
+37051,Cumberland County,North Carolina,332106,56,10.7,16298,13.6,24.299999999999997,1.22
+37067,Forsyth County,North Carolina,371573,43,12.8,21544,11.3,24.1,1.01
+37071,Gaston County,North Carolina,216585,27,12.4,8440,11.3,23.700000000000003,1.01
+37083,Halifax County,North Carolina,51737,61.5,13.3,2033,13.2,26.5,1.18
+37085,Harnett County,North Carolina,130361,38.2,14,3138,12.1,26.1,1.08
+37087,Haywood County,North Carolina,60433,7.1,12.3,2675,15.1,27.4,1.35
+37089,Henderson County,North Carolina,113625,16.8,14.6,4662,11.7,26.299999999999997,1.04
+37097,Iredell County,North Carolina,172525,23.8,12.1,9410,12.5,24.6,1.12
+37101,Johnston County,North Carolina,191172,31.7,13.6,6276,12.3,25.9,1.11
+37119,Mecklenburg County,North Carolina,1054314,52.7,13,81640,11.4,24.4,1.02
+37125,Moore County,North Carolina,95629,22.8,11.9,7164,19.4,31.299999999999997,1.74
+37127,Nash County,North Carolina,94003,49.6,12.1,4561,11.3,23.4,1.01
+37129,New Hanover County,North Carolina,224231,22.9,11.7,18686,15.9,27.6,1.42
+37141,Pender County,North Carolina,59020,25.2,12.8,1974,15.3,28.1,1.37
+37147,Pitt County,North Carolina,177372,45.3,11.8,9699,12.5,24.3,1.12
+37161,Rutherford County,North Carolina,66532,16.6,14,2124,11.3,25.3,1.02
+37167,Stanly County,North Carolina,61114,19.2,13,2345,12.1,25.1,1.09
+37183,Wake County,North Carolina,1046558,39.7,10,65629,11.4,21.4,1.02
+37189,Watauga County,North Carolina,54117,8.1,12.8,5499,22.3,35.1,2
+40017,Canadian County,Oklahoma,136710,23.3,13,4646,12.4,25.4,1.11
+40027,Cleveland County,Oklahoma,276733,27.8,13.1,13825,16,29.1,1.44
+40031,Comanche County,Oklahoma,122561,43.5,13.9,5106,12.2,26.1,1.09
+40109,Oklahoma County,Oklahoma,782051,43.6,16.8,53292,11.4,28.200000000000003,1.03
+40119,Payne County,Oklahoma,81512,23,16.3,5448,16.4,32.7,1.47
+40125,Pottawatomie County,Oklahoma,72000,27.3,15.5,2986,13.2,28.7,1.18
+40143,Tulsa County,Oklahoma,642781,37.5,15.7,40453,11.1,26.799999999999997,1
+40147,Washington County,Oklahoma,52001,26.9,16.4,2158,11.4,27.799999999999997,1.02
+41035,Klamath County,Oregon,66310,21.6,11,2803,11.8,22.8,1.06
+45003,Aiken County,South Carolina,166926,33.6,12.6,6955,11.3,23.9,1.01
+45007,Anderson County,South Carolina,195995,22.5,12.4,8202,12.3,24.700000000000003,1.1
+45013,Beaufort County,South Carolina,182658,32.4,14.3,16491,24,38.3,2.15
+45019,Charleston County,South Carolina,394708,35.8,10.9,39170,15.1,26,1.36
+45035,Dorchester County,South Carolina,155474,35.6,10.7,4932,13.6,24.299999999999997,1.22
+45041,Florence County,South Carolina,138561,47.8,12.3,8249,12.4,24.700000000000003,1.11
+45043,Georgetown County,South Carolina,61605,36.3,13.7,4623,18.9,32.599999999999994,1.69
+45051,Horry County,South Carolina,320915,22.8,17.2,38796,28.7,45.9,2.57
+45075,Orangeburg County,South Carolina,88454,66.8,12.7,3596,12.6,25.299999999999997,1.13
+45077,Pickens County,South Carolina,122746,14.1,13.5,7084,18.8,32.3,1.69
+45079,Richland County,South Carolina,408263,57.2,10.9,25161,11.2,22.1,1
+46103,Pennington County,South Dakota,109294,19.8,13.2,9662,16.5,29.7,1.48
+47009,Blount County,Tennessee,128443,8.8,11.4,5999,11.5,22.9,1.03
+47019,Carter County,Tennessee,56391,5,13.2,1451,12.5,25.7,1.12
+47037,Davidson County,Tennessee,684017,43.8,14,70072,13.5,27.5,1.21
+47043,Dickson County,Tennessee,51988,10.3,12.7,2167,11.9,24.6,1.07
+47065,Hamilton County,Tennessee,357546,28.8,11.9,24726,11.8,23.700000000000003,1.06
+47093,Knox County,Tennessee,456185,17.4,10.3,29781,12.3,22.6,1.11
+47105,Loudon County,Tennessee,51610,12,13.1,2021,12.3,25.4,1.1
+47141,Putnam County,Tennessee,76440,11.4,12.3,4205,11.1,23.4,1
+47149,Rutherford County,Tennessee,307128,28.3,10.2,15124,11.3,21.5,1.01
+47155,Sevier County,Tennessee,96287,9.6,17.5,23046,45.7,63.2,4.1
+47163,Sullivan County,Tennessee,156734,6.5,11.8,7830,11.5,23.3,1.03
+47165,Sumner County,Tennessee,179473,15.3,10,6394,11.3,21.3,1.02
+47179,Washington County,Tennessee,127055,11.1,10.7,7427,12.1,22.799999999999997,1.08
+48021,Bastrop County,Texas,82577,47,21.8,2855,15.3,37.1,1.37
+48027,Bell County,Texas,342236,53.6,15.1,13791,11.4,26.5,1.02
+48029,Bexar County,Texas,1925865,72,17.8,117103,13.3,31.1,1.19
+48037,Bowie County,Texas,93858,36.1,15.5,5419,13,28.5,1.16
+48039,Brazoria County,Texas,353999,51.9,16.4,13533,11.6,28,1.04
+48041,Brazos County,Texas,219193,43.9,16.8,16876,15.5,32.3,1.39
+48061,Cameron County,Texas,421750,90.9,30.2,16566,11.7,41.9,1.05
+48085,Collin County,Texas,944350,42,12.5,50959,11.8,24.3,1.06
+48091,Comal County,Texas,135097,31.9,15.4,10273,17.1,32.5,1.53
+48099,Coryell County,Texas,75389,41,15.2,1879,11.7,26.9,1.05
+48121,Denton County,Texas,807047,40,13,35202,13.5,26.5,1.21
+48135,Ector County,Texas,158342,66.6,21.4,9046,11.2,32.599999999999994,1
+48141,El Paso County,Texas,837654,87.8,23.8,37983,12.1,35.9,1.09
+48157,Fort Bend County,Texas,739342,66.3,13.2,27314,14,27.2,1.25
+48167,Galveston County,Texas,327089,42.3,17.4,19220,17.5,34.9,1.56
+48181,Grayson County,Texas,128560,24.2,20.5,5563,11.8,32.3,1.05
+48199,Hardin County,Texas,56379,13.3,15.4,1788,14,29.4,1.26
+48209,Hays County,Texas,204150,45.5,17.6,10657,14.5,32.1,1.3
+48213,Henderson County,Texas,80460,21.5,22.3,2236,12.7,35,1.14
+48221,Hood County,Texas,56901,15.6,17,2340,13.8,30.8,1.24
+48265,Kerr County,Texas,51365,30.9,21.7,2763,14.9,36.6,1.33
+48303,Lubbock County,Texas,301454,46,15.6,20620,14.6,30.2,1.31
+48339,Montgomery County,Texas,554445,33.1,17.7,26272,13.7,31.4,1.23
+48347,Nacogdoches County,Texas,65558,40.4,20.9,3017,13.5,34.4,1.21
+48355,Nueces County,Texas,360486,70.1,20.3,22288,13.6,33.9,1.22
+48367,Parker County,Texas,129802,16.1,17.7,4323,12.4,30.1,1.11
+48375,Potter County,Texas,120899,55.5,24.5,8894,11.5,36,1.03
+48381,Randall County,Texas,132475,27.5,13.2,4817,14.8,28,1.33
+48397,Rockwall County,Texas,93642,28.4,13.8,5306,16.2,30,1.45
+48409,San Patricio County,Texas,67046,61.2,17.7,2384,12.8,30.5,1.15
+48439,Tarrant County,Texas,2019977,52.6,19,111447,12.1,31.1,1.08
+48441,Taylor County,Texas,136348,36.1,17.4,7656,11.7,29.099999999999998,1.05
+48451,Tom Green County,Texas,117466,46.2,16.8,6102,12.8,29.6,1.14
+48453,Travis County,Texas,1203166,50.9,14.8,97437,12.5,27.3,1.12
+48467,Van Zandt County,Texas,54368,15.9,21.4,1625,14.4,35.8,1.29
+48469,Victoria County,Texas,91970,55,18.3,4322,11.2,29.5,1
+48479,Webb County,Texas,272053,96.5,29.8,11508,11.2,41,1
+48485,Wichita County,Texas,131818,34.4,17.3,6586,12,29.3,1.08
+48491,Williamson County,Texas,527057,39.9,12.4,23157,12.8,25.200000000000003,1.14
+49053,Washington County,Utah,160537,15.4,13.5,10236,14.4,27.9,1.29
+51061,Fauquier County,Virginia,69115,19.6,10.1,2600,11.6,21.7,1.04
+51121,Montgomery County,Virginia,97997,16.4,10.4,5009,11.9,22.3,1.06
+51153,Prince William County,Virginia,456749,56.3,11.7,17408,13.1,24.799999999999997,1.17
+51177,Spotsylvania County,Virginia,131412,31.2,10.2,4920,13.7,23.9,1.23
+51660,Harrisonburg city,Virginia,53391,33.4,14.6,5376,16.9,31.5,1.52
+51680,Lynchburg city,Virginia,80131,37.7,10.7,6355,12.2,22.9,1.09
+53007,Chelan County,Washington,75757,31.9,11.2,5725,12.3,23.5,1.1
+56025,Natrona County,Wyoming,80610,13.1,13.2,4728,12,25.2,1.08

@@ -19,6 +19,7 @@ library("ggplot2")
 library("htmltools")
 library("purrr")
 library("readr")
+library("readxl")
 library("sf")
 library("stringr")
 library("tidyr")
@@ -41,8 +42,8 @@ counties_leisure_hospitality <- read_csv("https://data.bls.gov/cew/data/api/2019
   filter(own_code == 5 & agglvl_code == 73) %>% # Privately-owned, county-level
   select(area_fips, employment_leisure_hospitality = month3_emplvl, employment_leisure_hospitality_lq = lq_month3_emplvl)
 
-# Import 2017 health insurance data from the Census Bureau's (Small Area Health Insurance Estimates)[https://www.census.gov/programs-surveys/sahie/data/datasets.html]
-counties_health_insurance <- read_csv("data/sahie_2017.csv", skip = 79) %>% 
+# Import 2018 health insurance data from the Census Bureau's (Small Area Health Insurance Estimates)[https://www.census.gov/programs-surveys/sahie/data/datasets.html]
+counties_health_insurance <- read_csv("data/sahie_2018.csv", skip = 79) %>% 
   filter(geocat == "50" & agecat == "0" & sexcat == "0" & (iprcat == "0" | iprcat == "3")) %>% 
   mutate(area_fips = paste0(statefips, countyfips)) %>% 
   # Reshape the data from "long" to "wide" format
@@ -87,33 +88,39 @@ states_leisure_hospitality <- read_csv("https://data.bls.gov/cew/data/api/2019/3
   mutate(area_fips = substr(area_fips, 1, 2)) %>% 
   select(area_fips, employment_leisure_hospitality = month3_emplvl, employment_leisure_hospitality_lq = lq_month3_emplvl)
 
-# Import 2017 health insurance data from the Census Bureau's (Small Area Health Insurance Estimates)[https://www.census.gov/programs-surveys/sahie/data/datasets.html]
-states_health_insurance <- read_csv("data/sahie_2017.csv", skip = 79) %>% 
-  filter(geocat == "40" & agecat == "0" & sexcat == "0" & (iprcat == "0" | iprcat == "3")) %>% 
-  mutate(racecat = recode(racecat, '0' = "all_races", '1' = "white", '2' = "black", '3' = "hispanic"),
+# Import 2018 health insurance data from the Census Bureau's (Small Area Health Insurance Estimates)[https://www.census.gov/programs-surveys/sahie/data/datasets.html]
+states_health_insurance <- read_csv("data/sahie_2018.csv", skip = 79) %>% 
+  filter(geocat == "40" & agecat == "0" & sexcat == "0" & iprcat == "0" |
+           geocat == "40" & agecat == "1" & racecat == "0" & sexcat == "0" & iprcat == "3") %>% 
+  mutate(agecat = recode(agecat, '0' = "all_ages", '1' = "18_to_64"),
+         racecat = recode(racecat, '0' = "all_races", '1' = "white", '2' = "black", '3' = "hispanic"),
          iprcat = recode(iprcat, '0' = "all_incomes", '3' = "138_below_poverty")) %>% 
   # Reshape the data from "long" to "wide" format
   pivot_wider(id_cols = c(statefips, state_name),
-              names_from = c("racecat", "iprcat"),
+              names_from = c("agecat", "racecat", "iprcat"),
               values_from = c("NIPR", "NUI", "PCTUI")) %>% 
-  mutate(num_uninsured_non_white = NUI_all_races_all_incomes - NUI_white_all_incomes,
-         pct_uninsured_non_white = round((NUI_all_races_all_incomes - NUI_white_all_incomes) / (NIPR_all_races_all_incomes - NIPR_white_all_incomes) * 100, digits = 1)) %>% 
+  mutate(num_uninsured_non_white = NUI_all_ages_all_races_all_incomes - NUI_all_ages_white_all_incomes,
+         pct_uninsured_non_white = round((NUI_all_ages_all_races_all_incomes - NUI_all_ages_white_all_incomes) / (NIPR_all_ages_all_races_all_incomes - NIPR_all_ages_white_all_incomes) * 100, digits = 1)) %>% 
   select(area_fips = statefips,
          state_name,
-         num_uninsured_total = NUI_all_races_all_incomes,
-         num_uninsured_138_below_poverty = NUI_all_races_138_below_poverty,
-         num_uninsured_white = NUI_white_all_incomes,
+         num_uninsured_total = NUI_all_ages_all_races_all_incomes,
+         num_uninsured_138_below_poverty = NUI_18_to_64_all_races_138_below_poverty,
+         num_uninsured_white = NUI_all_ages_white_all_incomes,
          num_uninsured_non_white,
-         num_uninsured_black = NUI_black_all_incomes,
-         num_uninsured_hispanic = NUI_hispanic_all_incomes,
-         pct_uninsured_total = PCTUI_all_races_all_incomes,
-         pct_uninsured_138_below_poverty = PCTUI_all_races_138_below_poverty,
-         pct_uninsured_white = PCTUI_white_all_incomes,
+         num_uninsured_black = NUI_all_ages_black_all_incomes,
+         num_uninsured_hispanic = NUI_all_ages_hispanic_all_incomes,
+         pct_uninsured_total = PCTUI_all_ages_all_races_all_incomes,
+         pct_uninsured_138_below_poverty = PCTUI_18_to_64_all_races_138_below_poverty,
+         pct_uninsured_white = PCTUI_all_ages_white_all_incomes,
          pct_uninsured_non_white,
-         pct_uninsured_black = PCTUI_black_all_incomes,
-         pct_uninsured_hispanic = PCTUI_hispanic_all_incomes)
+         pct_uninsured_black = PCTUI_all_ages_black_all_incomes,
+         pct_uninsured_hispanic = PCTUI_all_ages_hispanic_all_incomes)
 
-# Import data on Medicaid expansion from (Kaiser Health News)[https://www.kff.org/health-reform/state-indicator/state-activity-around-expanding-medicaid-under-the-affordable-care-act/?currentTimeframe=0&sortModel=%7B%22colId%22:%22Location%22,%22sort%22:%22asc%22%7D]
+# Import the 4/9/20 weekly uninsurance claims report from (the DoL)[https://oui.doleta.gov/press/2020/040920.pdf]
+ui_claims <- read_excel("data/dol_weekly_ui_claims_report_2020_04_09.xlsx", sheet = 2) %>% 
+  filter(state_supplied_comment != "No comment." & state_supplied_comment != "No comments.")
+
+# Import data on Medicaid expansion from the (Kaiser Family Foundation)[https://www.kff.org/health-reform/state-indicator/state-activity-around-expanding-medicaid-under-the-affordable-care-act/?currentTimeframe=0&sortModel=%7B%22colId%22:%22Location%22,%22sort%22:%22asc%22%7D]
 medicaid_expansion <- read_csv("data/medicaid_expansion.csv", skip = 2, n_max = 52) %>% 
   select(state_name = Location,
          med_exp_status = "Status of Medicaid Expansion Decision")
@@ -189,6 +196,8 @@ states_leisure_hospitality_insurance %>%
 states_leisure_hospitality_insurance %>% 
   filter(pct_uninsured_hispanic < pct_uninsured_white) # Hispanic
 states_leisure_hospitality_insurance %>% 
+  filter(pct_uninsured_hispanic < pct_uninsured_black) # Hispanic vs. Black
+states_leisure_hospitality_insurance %>% 
   summarize(median(pct_uninsured_white - pct_uninsured_non_white, na.rm = T)) # Median disparity between white and non-white uninsured rate
 states_leisure_hospitality_insurance %>% 
   filter(med_exp_status == "Adopted") %>% 
@@ -212,6 +221,11 @@ attach(counties_leisure_hospitality_insurance)
 plot(pct_non_white, pct_uninsured_total, main = "Percent Non-White vs. Percent Uninsured",
    xlab="Percent Non-White", ylab="Percent Uninsured", pch=19)
 abline(lm(pct_uninsured_total ~ pct_non_white), col = "red") # regression line (y~x)
+
+# Of the 35 states that offered comments to the Department of Labor in the 4/9/20 UI claims report, how many mentioned leisure and hospitality?
+leisure_hospitality_mentioned_ui_claims <- ui_claims %>% 
+  filter(str_detect(state_supplied_comment, "accommodation and food services") |
+           str_detect(state_supplied_comment, "arts, entertainment, and recreation"))
 
 # Export the data
 write_csv(counties_more_reliant_higher_uninsured, "data/exported/counties_more_reliant_higher_uninsured.csv")

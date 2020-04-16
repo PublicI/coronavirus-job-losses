@@ -3,8 +3,8 @@ This repo contains code and data for "[Title TK](URL TK)," a Center for Public I
 
 ### Here's what's in this repo.
 
-##### [coronavirus-jobs-losses.Rmd](coronavirus-jobs-losses.Rmd)
-This R Markdown file contains code used to analyze industry employment concentration, health insurance rates and unemployment insurance claims.
+##### [coronavirus-job-losses.Rmd](coronavirus-job-losses.Rmd)
+This R Markdown file contains code used to analyze industry employment concentration and health insurance rates.
 
 ##### [counties_leisure_hospitality_insurance.csv](data/exported/counties_leisure_hospitality_insurance.csv)
 This CSV file contains county-level data on the number and concentration of workers in the leisure and hospitality super sector and the health insurance rate for residents. The data comes from the Bureau of Labor Statistics' [Quarterly Census of Employment and Wages](https://data.bls.gov/cew/apps/data_views/data_views.htm#tab=Tables) for the third quarter of 2019 and the Census Bureau's [Small Area Health Insurance Estimates](https://www.census.gov/data/datasets/time-series/demo/sahie/estimates-acs.html) for 2018.

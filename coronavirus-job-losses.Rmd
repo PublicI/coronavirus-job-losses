@@ -1,7 +1,7 @@
 ---
 title: "coronavirus-job-losses"
-author: "Joe Yerardi"
-date: "3/23/2020"
+author: "Joe Yerardi, Center for Public Integrity"
+date: "4/16/2020"
 output: html_document
 editor_options: 
   chunk_output_type: console

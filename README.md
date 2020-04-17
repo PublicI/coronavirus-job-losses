@@ -1,5 +1,5 @@
-# Title TK
-This repo contains code and data for "[Title TK](URL TK)," a Center for Public Integrity story identifying the communities with existing low health insurance rates that are also likely to see a surge in newly-jobless (and thus uninsured) residents..
+# In these counties, out of work meets uninsured
+This repo contains code and data for "[In these counties, out of work meets uninsured](https://publicintegrity.org/health/coronavirus-and-inequality/in-these-counties-out-of-work-meets-uninsured/)," a Center for Public Integrity story identifying the communities with existing low health insurance rates that are also likely to see a surge in newly-jobless (and thus uninsured) residents. The story was published on April 17, 2020.
 
 ### Here's what's in this repo.
 
